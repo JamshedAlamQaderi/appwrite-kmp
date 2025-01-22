@@ -5,11 +5,15 @@ import com.jamshedalamqaderi.appwrite.kmp.exceptions.AppwriteException
 import com.jamshedalamqaderi.appwrite.kmp.extensions.fromJson
 import com.jamshedalamqaderi.appwrite.kmp.extensions.json
 import com.jamshedalamqaderi.appwrite.kmp.models.ClientParam
+import com.jamshedalamqaderi.appwrite.kmp.models.Progress
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.onDownload
+import io.ktor.client.plugins.onUpload
 import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.pingInterval
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.parameter
@@ -36,6 +40,7 @@ import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.seconds
 
 class Client(
     private var endpoint: String = "https://cloud.appwrite.io/v1",
@@ -210,10 +215,22 @@ class Client(
         deserializer: DeserializationStrategy<T>,
         headers: Map<String, String> = mapOf(),
         params: List<ClientParam> = emptyList(),
+        onUpload: ((Progress) -> Unit)? = null,
+        onDownload: ((Progress) -> Unit)? = null,
     ): T {
         createOrGetClient()
         val response =
             http.request(path.replaceFirst("/", "")) {
+                if (onUpload != null) {
+                    onUpload { sent, total ->
+                        onUpload(Progress(total ?: 0L, sent))
+                    }
+                }
+                if (onDownload != null) {
+                    onDownload { received, total ->
+                        onDownload(Progress(total ?: 0, received))
+                    }
+                }
                 this.method = method
                 headers.forEach {
                     this.headers.append(it.key, it.value)
@@ -336,7 +353,7 @@ class Client(
                     }
                 }
                 install(WebSockets) {
-                    pingInterval = 0
+                    pingInterval = 0.seconds
                 }
             }
         updated = false

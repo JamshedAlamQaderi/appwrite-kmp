@@ -2,7 +2,7 @@ package com.jamshedalamqaderi.appwrite.kmp.enums
 
 import kotlinx.serialization.SerialName
 
-enum class ExecutionMethod(private val value: String) {
+enum class ExecutionMethod(val value: String) {
     @SerialName("GET")
     GET("GET"),
 

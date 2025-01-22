@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -9,8 +11,12 @@ apply(plugin = "kotlinx-atomicfu")
 kotlin {
     androidTarget()
     jvm()
-//    @OptIn(ExperimentalWasmDsl::class)
-//    wasmJs()
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        nodejs()
+        binaries.library()
+    }
     js {
         browser()
         nodejs()
@@ -51,9 +57,9 @@ kotlin {
             implementation(libs.ktor.client.js)
             implementation(npm("@js-joda/timezone", "2.3.0"))
         }
-//        wasmJsMain.dependencies {
-//            implementation(libs.ktor.client.js)
-//        }
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
+        }
     }
 }
 

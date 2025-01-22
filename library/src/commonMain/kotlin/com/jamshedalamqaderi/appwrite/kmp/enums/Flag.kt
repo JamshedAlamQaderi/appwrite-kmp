@@ -2,7 +2,7 @@ package com.jamshedalamqaderi.appwrite.kmp.enums
 
 import kotlinx.serialization.SerialName
 
-enum class Flag(private val value: String) {
+enum class Flag(val value: String) {
     @SerialName("af")
     AFGHANISTAN("af"),
 

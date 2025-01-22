@@ -2,7 +2,7 @@ package com.jamshedalamqaderi.appwrite.kmp.enums
 
 import kotlinx.serialization.SerialName
 
-enum class CreditCard(private val value: String) {
+enum class CreditCard(val value: String) {
     @SerialName("amex")
     AMERICAN_EXPRESS("amex"),
 
