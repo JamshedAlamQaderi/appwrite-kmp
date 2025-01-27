@@ -39,7 +39,7 @@ class CachedCookiesStorage : CookiesStorage {
             val container = readAllCookies().toMutableList()
             container.removeAll { (existingCookie, _) ->
                 existingCookie.name == cookie.name &&
-                    existingCookie.toHttpCookie().matches(requestUrl)
+                        existingCookie.toHttpCookie().matches(requestUrl)
             }
             val createdAt = getTimeMillis()
             container.add(
@@ -51,7 +51,7 @@ class CachedCookiesStorage : CookiesStorage {
                 ),
             )
 
-            cookie.maxAgeOrExpires(createdAt).let {
+            cookie.maxAgeOrExpires(createdAt)?.let {
                 if (oldestCookie.value > it) {
                     oldestCookie.value = it
                 }
@@ -96,11 +96,12 @@ class CachedCookiesStorage : CookiesStorage {
 
         val newOldest =
             container.fold(Long.MAX_VALUE) { acc, (cookie, createdAt) ->
-                cookie.toHttpCookie().maxAgeOrExpires(createdAt).let { min(acc, it) } ?: acc
+                cookie.toHttpCookie().maxAgeOrExpires(createdAt)?.let { min(acc, it) } ?: acc
             }
 
         oldestCookie.value = newOldest
     }
 
-    private fun Cookie.maxAgeOrExpires(createdAt: Long): Long = maxAge.let { createdAt + it * 1000 }
+    private fun Cookie.maxAgeOrExpires(createdAt: Long): Long? =
+        maxAge?.let { createdAt + (it * 1000) }
 }

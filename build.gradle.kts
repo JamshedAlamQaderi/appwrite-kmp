@@ -1,13 +1,15 @@
-buildscript {
-    dependencies {
-        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.24.0")
-    }
-}
+//buildscript {
+//    dependencies {
+//        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.27.0")
+//    }
+//}
 
 plugins {
     alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.atomicfu) apply false
 }
 
 group = "com.jamshedalamqaderi"

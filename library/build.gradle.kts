@@ -4,9 +4,10 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.atomicfu)
 }
 
-apply(plugin = "kotlinx-atomicfu")
+//apply(plugin = "kotlinx-atomicfu")
 
 kotlin {
     androidTarget()
@@ -14,12 +15,10 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
-        nodejs()
         binaries.library()
     }
     js {
         browser()
-        nodejs()
         binaries.library()
     }
     sourceSets {

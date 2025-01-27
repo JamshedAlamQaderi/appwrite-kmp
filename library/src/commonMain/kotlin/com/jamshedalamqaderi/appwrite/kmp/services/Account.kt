@@ -23,7 +23,6 @@ import com.jamshedalamqaderi.appwrite.kmp.models.User
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.JsonElement
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -61,9 +60,9 @@ class Account(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
     @Throws(AppwriteException::class)
-    suspend fun get(): User<JsonElement> =
+    suspend fun get(): User<Map<String, String>> =
         get(
-            nestedType = JsonElement.serializer(),
+            nestedType = mapSerializer(),
         )
 
     /**

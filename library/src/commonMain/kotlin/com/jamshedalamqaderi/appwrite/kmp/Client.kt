@@ -14,6 +14,7 @@ import io.ktor.client.plugins.onDownload
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.pingInterval
+import io.ktor.client.request.forms.InputProvider
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.parameter
@@ -29,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
-import kotlinx.io.readByteArray
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
@@ -264,8 +264,12 @@ class Client(
                                             is ClientParam.FileParam -> {
                                                 append(
                                                     "file",
-                                                    SystemFileSystem.source(param.path).buffered()
-                                                        .readByteArray(),
+                                                    InputProvider(
+                                                        SystemFileSystem.metadataOrNull(param.path)?.size
+                                                    ) {
+                                                        SystemFileSystem.source(param.path)
+                                                            .buffered()
+                                                    },
                                                     Headers.build {
                                                         append(
                                                             HttpHeaders.ContentType,
