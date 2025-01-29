@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.atomicfu)
 }
 
-//apply(plugin = "kotlinx-atomicfu")
+// apply(plugin = "kotlinx-atomicfu")
 
 kotlin {
     androidTarget()
@@ -21,23 +21,30 @@ kotlin {
         browser()
         binaries.library()
     }
+
+    iosArm64()
+    iosX64()
+    iosSimulatorArm64()
+
     sourceSets {
-        commonMain.dependencies {
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.serialization)
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.kotlinx.io)
-            implementation(libs.kotlinx.atomicfu)
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.serialization)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.io)
+                implementation(libs.kotlinx.atomicfu)
 
-            // ktor
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.logging)
-            implementation(libs.ktor.client.serialization)
+                // ktor
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.client.serialization)
 
-            // util
-            implementation(libs.multiplatform.settings)
+                // util
+                implementation(libs.multiplatform.settings)
 
-            implementation(libs.logging.kermit)
+                implementation(libs.logging.kermit)
+            }
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
@@ -58,6 +65,20 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.js)
+        }
+
+        val iosX64Main by getting
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+
+        val iosMain by creating {
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+            dependsOn(commonMain)
+            dependencies {
+                implementation(libs.ktor.client.darwin)
+            }
         }
     }
 }

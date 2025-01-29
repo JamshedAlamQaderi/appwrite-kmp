@@ -23,7 +23,7 @@ subprojects {
         filter {
             exclude {
                 it.file.path.contains(
-                    java.nio.file.Paths.get("${layout.buildDirectory}/generated").toString(),
+                    java.nio.file.Paths.get("${project.layout.buildDirectory.get()}/generated").toString(),
                 )
             }
         }

@@ -40,6 +40,7 @@ import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 
 class Client(
@@ -208,7 +209,7 @@ class Client(
      * @return String
      */
     @OptIn(ExperimentalSerializationApi::class)
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun <T> call(
         method: HttpMethod,
         path: String,
@@ -265,7 +266,7 @@ class Client(
                                                 append(
                                                     "file",
                                                     InputProvider(
-                                                        SystemFileSystem.metadataOrNull(param.path)?.size
+                                                        SystemFileSystem.metadataOrNull(param.path)?.size,
                                                     ) {
                                                         SystemFileSystem.source(param.path)
                                                             .buffered()

@@ -35,4 +35,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "appwrite-kmp"
 
-include(":library", ":sample")
+include(":library", ":example:composeApp")
