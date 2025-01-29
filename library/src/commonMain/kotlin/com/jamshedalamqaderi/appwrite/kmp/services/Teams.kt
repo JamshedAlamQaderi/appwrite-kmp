@@ -13,6 +13,7 @@ import com.jamshedalamqaderi.appwrite.kmp.models.TeamList
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonElement
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -65,7 +66,7 @@ class Teams(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.TeamList<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun list(
         queries: List<String>? = null,
         search: String? = null,
@@ -126,7 +127,7 @@ class Teams(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.Team<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun create(
         teamId: String,
         name: String,
@@ -176,7 +177,7 @@ class Teams(client: Client) : Service(client) {
      * @param teamId Team ID.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.Team<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun get(teamId: String): Team<Map<String, String>> =
         get(
             teamId,
@@ -228,7 +229,7 @@ class Teams(client: Client) : Service(client) {
      * @param name New team name. Max length: 128 chars.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.Team<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateName(
         teamId: String,
         name: String,
@@ -531,7 +532,7 @@ class Teams(client: Client) : Service(client) {
      * @param teamId Team ID.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.Preferences<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun getPrefs(teamId: String): Preferences<Map<String, String>> =
         getPrefs(
             teamId,
@@ -583,7 +584,7 @@ class Teams(client: Client) : Service(client) {
      * @param prefs Prefs key-value JSON object.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.models.Preferences<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updatePrefs(
         teamId: String,
         prefs: Map<String, String>,

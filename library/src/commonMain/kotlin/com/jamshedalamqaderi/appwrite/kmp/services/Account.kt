@@ -23,6 +23,7 @@ import com.jamshedalamqaderi.appwrite.kmp.models.User
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -59,7 +60,7 @@ class Account(client: Client) : Service(client) {
      *
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun get(): User<Map<String, String>> =
         get(
             nestedType = mapSerializer(),
@@ -118,7 +119,7 @@ class Account(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun create(
         userId: String,
         email: String,
@@ -176,7 +177,7 @@ class Account(client: Client) : Service(client) {
      * @param password User password. Must be at least 8 chars.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateEmail(
         email: String,
         password: String,
@@ -336,7 +337,7 @@ class Account(client: Client) : Service(client) {
      * @param mfa Enable or disable MFA.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateMFA(mfa: Boolean): User<Map<String, String>> =
         updateMFA(
             mfa,
@@ -414,7 +415,7 @@ class Account(client: Client) : Service(client) {
      * @param otp Valid verification token.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateMfaAuthenticator(
         type: AuthenticatorType,
         otp: String,
@@ -656,7 +657,7 @@ class Account(client: Client) : Service(client) {
      * @param name User name. Max length: 128 chars.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateName(name: String): User<Map<String, String>> =
         updateName(
             name,
@@ -709,7 +710,7 @@ class Account(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updatePassword(
         password: String,
         oldPassword: String? = null,
@@ -764,7 +765,7 @@ class Account(client: Client) : Service(client) {
      * @param password User password. Must be at least 8 chars.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updatePhone(
         phone: String,
         password: String,
@@ -806,7 +807,7 @@ class Account(client: Client) : Service(client) {
      *
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.Preferences<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun getPrefs(): Preferences<Map<String, String>> =
         getPrefs(
             nestedType = mapSerializer(),
@@ -852,7 +853,7 @@ class Account(client: Client) : Service(client) {
      * @param prefs Prefs key-value JSON object.
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updatePrefs(prefs: Map<String, String>): User<Map<String, String>> =
         updatePrefs(
             prefs,
@@ -1320,7 +1321,7 @@ class Account(client: Client) : Service(client) {
      *
      * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
      */
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateStatus(): User<Map<String, String>> =
         updateStatus(
             nestedType = mapSerializer(),

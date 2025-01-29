@@ -12,6 +12,7 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -74,7 +75,7 @@ class Databases(client: Client) : Service(client) {
      * @return [io.appwrite.models.DocumentList<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun listDocuments(
         databaseId: String,
         collectionId: String,
@@ -146,7 +147,7 @@ class Databases(client: Client) : Service(client) {
      * @return [io.appwrite.models.Document<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun createDocument(
         databaseId: String,
         collectionId: String,
@@ -218,7 +219,7 @@ class Databases(client: Client) : Service(client) {
      * @return [io.appwrite.models.Document<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun getDocument(
         databaseId: String,
         collectionId: String,
@@ -292,7 +293,7 @@ class Databases(client: Client) : Service(client) {
      * @return [io.appwrite.models.Document<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateDocument(
         databaseId: String,
         collectionId: String,
