@@ -23,6 +23,7 @@ import com.jamshedalamqaderi.kmp.appwrite.models.Token
 import com.jamshedalamqaderi.kmp.appwrite.models.User
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
+import io.ktor.util.PlatformUtils
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlin.coroutines.cancellation.CancellationException
@@ -1087,7 +1088,7 @@ class Account(client: Client) : Service(client) {
         success: String? = null,
         failure: String? = null,
         scopes: List<String>? = null,
-    ): Session {
+    ) {
         val apiPath =
             "/account/sessions/oauth2/{provider}"
                 .replace("{provider}", provider.value)
@@ -1119,6 +1120,7 @@ class Account(client: Client) : Service(client) {
         val apiUrl = "${client.endpoint}$apiPath?${apiQuery.joinToString("&")}"
         val callbackUrlScheme = "appwrite-callback-${client.config["project"]}"
         val callbackUrl = launchOAuth2Url(apiUrl, callbackUrlScheme)
+        if (callbackUrl.isEmpty() && PlatformUtils.IS_BROWSER) return
         val url = callbackUrl.let(::Url)
         val secret =
             url.parameters["secret"]
@@ -1127,7 +1129,7 @@ class Account(client: Client) : Service(client) {
             url.parameters["userId"]
                 ?: throw AppwriteException("OAuth2 response missing 'userId' parameter.")
 
-        return createSession(userId, secret)
+        createSession(userId, secret)
     }
 
     /**
@@ -1142,7 +1144,7 @@ class Account(client: Client) : Service(client) {
     suspend fun createOAuth2Session(
         provider: OAuthProvider,
         scopes: List<String>? = null,
-    ): Session {
+    ) {
         val url = Url(client.endpoint)
         return createOAuth2Session(
             provider = provider,
@@ -1529,13 +1531,13 @@ class Account(client: Client) : Service(client) {
         success: String? = null,
         failure: String? = null,
         scopes: List<String>? = null,
-    ): Session {
+    ) {
         val apiPath =
             "/account/tokens/oauth2/{provider}"
                 .replace("{provider}", provider.value)
 
         val apiParams =
-            mutableMapOf<String, Any?>(
+            mutableMapOf(
                 "success" to success,
                 "failure" to failure,
                 "scopes" to scopes,
@@ -1560,6 +1562,7 @@ class Account(client: Client) : Service(client) {
         val apiUrl = "${client.endpoint}$apiPath?${apiQuery.joinToString("&")}"
         val callbackUrlScheme = "appwrite-callback-${client.config["project"]}"
         val callbackUrl = launchOAuth2Url(apiUrl, callbackUrlScheme)
+        if (callbackUrl.isEmpty() && PlatformUtils.IS_BROWSER) return
         val url = callbackUrl.let(::Url)
         val secret =
             url.parameters["secret"]
@@ -1568,7 +1571,7 @@ class Account(client: Client) : Service(client) {
             url.parameters["userId"]
                 ?: throw AppwriteException("OAuth2 response missing 'userId' parameter.")
 
-        return createSession(userId, secret)
+        createSession(userId, secret)
     }
 
     /**
@@ -1583,7 +1586,7 @@ class Account(client: Client) : Service(client) {
     suspend fun createOAuth2Token(
         provider: OAuthProvider,
         scopes: List<String>? = null,
-    ): Session {
+    ) {
         val url = Url(client.endpoint)
         return createOAuth2Token(
             provider = provider,

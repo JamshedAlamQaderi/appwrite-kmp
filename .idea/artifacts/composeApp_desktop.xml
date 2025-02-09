@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="composeApp-desktop">
-    <output-path>$PROJECT_DIR$/example/composeApp/build/libs</output-path>
-    <root id="archive" name="composeApp-desktop.jar">
-      <element id="module-output" name="appwrite-kmp.example.composeApp.desktopMain" />
-    </root>
-  </artifact>
-</component>

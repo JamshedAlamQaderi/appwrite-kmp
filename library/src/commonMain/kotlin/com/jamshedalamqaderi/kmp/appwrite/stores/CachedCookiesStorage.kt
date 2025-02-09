@@ -64,6 +64,7 @@ class CachedCookiesStorage : CookiesStorage {
 
     override suspend fun get(requestUrl: Url): List<Cookie> =
         mutex.withLock {
+            println("reading all cookies: $requestUrl")
             val container = readAllCookies()
             val now = getTimeMillis()
             if (now >= oldestCookie.value) cleanup(now, container)
