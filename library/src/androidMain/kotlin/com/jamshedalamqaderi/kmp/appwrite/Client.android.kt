@@ -38,3 +38,6 @@ internal actual fun defaultHeaders(): MutableMap<String, String> {
         "x-appwrite-response-format" to "1.5.7",
     )
 }
+
+internal actual fun Client.onClientInit() {
+}
