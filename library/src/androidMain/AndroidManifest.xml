@@ -12,7 +12,7 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="com.jamshedalamqaderi.appwrite.kmp.AppwriteKmpInitializer"
+                android:name="com.jamshedalamqaderi.kmp.appwrite.AppwriteKmpInitializer"
                 android:value="androidx.startup" />
         </provider>
     </application>

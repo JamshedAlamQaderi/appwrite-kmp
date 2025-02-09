@@ -1,16 +1,23 @@
+import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.atomicfu)
+    alias(libs.plugins.vanniktech.mavenPublish)
 }
 
-// apply(plugin = "kotlinx-atomicfu")
-
 kotlin {
-    androidTarget()
+    applyDefaultHierarchyTemplate()
+    androidTarget {
+        publishLibraryVariants("release")
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
     jvm()
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -22,9 +29,15 @@ kotlin {
         binaries.library()
     }
 
-    iosArm64()
-    iosX64()
-    iosSimulatorArm64()
+    listOf(
+        iosArm64(),
+        iosX64(),
+        iosSimulatorArm64(),
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            linkerOpts("-framework", "AuthenticationServices")
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -44,6 +57,7 @@ kotlin {
                 implementation(libs.multiplatform.settings)
 
                 implementation(libs.logging.kermit)
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
         androidMain.dependencies {
@@ -67,18 +81,8 @@ kotlin {
             implementation(libs.ktor.client.js)
         }
 
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
-
-        val iosMain by creating {
-            iosX64Main.dependsOn(this)
-            iosArm64Main.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
-            dependsOn(commonMain)
-            dependencies {
-                implementation(libs.ktor.client.darwin)
-            }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
@@ -89,5 +93,38 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    signAllPublications()
+    coordinates(group.toString(), "appwrite-kmp", version.toString())
+
+    pom {
+        name = "Appwrite KMP"
+        description = "KMP api for appwrite database"
+        inceptionYear = "2025"
+        url = "https://github.com/JamshedAlamQaderi/appwrite-kmp"
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+        developers {
+            developer {
+                id.set("JamshedAlamQaderi")
+                name.set("Jamshed Alam Qaderi")
+                url.set("https://github.com/JamshedAlamQaderi")
+            }
+        }
+        scm {
+            url.set("https://github.com/JamshedAlamQaderi/appwrite-kmp")
+            connection.set("scm:git:git://github.com/JamshedAlamQaderi/appwrite-kmp.git")
+            developerConnection.set("scm:git:ssh://git@github.com/JamshedAlamQaderi/appwrite-kmp.git")
+        }
     }
 }

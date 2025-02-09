@@ -10,14 +10,14 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.atomicfu) apply false
+    alias(libs.plugins.vanniktech.mavenPublish) apply false
 }
-
-group = "com.jamshedalamqaderi"
-version = "1.0-SNAPSHOT"
-
 
 subprojects {
     apply(plugin = rootProject.libs.plugins.ktlint.get().pluginId)
+
+    group = "com.jamshedalamqaderi.kmp"
+    version = project.property("version") as String
 
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         filter {

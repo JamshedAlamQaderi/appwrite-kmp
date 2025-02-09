@@ -12,6 +12,7 @@ pluginManagement {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
         gradlePluginPortal()
+        mavenLocal()
     }
 }
 
@@ -26,6 +27,7 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+        mavenLocal()
     }
     versionCatalogs {
         create("libs") {

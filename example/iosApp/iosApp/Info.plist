@@ -46,5 +46,18 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+    <array>
+    <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>io.appwrite</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>appwrite-callback-6797667e0013cde0eb41</string>
+        </array>
+    </dict>
+    </array>
 </dict>
 </plist>
