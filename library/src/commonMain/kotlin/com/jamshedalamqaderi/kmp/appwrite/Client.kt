@@ -64,6 +64,7 @@ class Client(
     init {
         updated = true
         setSelfSigned(selfSigned)
+        onClientInit()
     }
 
     /**
@@ -371,3 +372,5 @@ class Client(
 internal expect fun httpEngine(): HttpClientEngine
 
 internal expect fun defaultHeaders(): MutableMap<String, String>
+
+internal expect fun Client.onClientInit()
