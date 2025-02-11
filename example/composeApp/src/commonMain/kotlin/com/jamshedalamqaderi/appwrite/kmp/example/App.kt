@@ -26,6 +26,7 @@ fun App() {
     val client: Client =
         remember {
             Client()
+                .setEndpoint("https://")
                 .setProject("6797667e0013cde0eb41")
         }
     val account = remember(client) { Account(client) }
