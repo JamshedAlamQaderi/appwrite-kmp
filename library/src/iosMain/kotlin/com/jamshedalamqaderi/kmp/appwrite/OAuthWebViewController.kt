@@ -29,7 +29,9 @@ class OAuthWebViewController(
         // Create and configure WKWebView.
         val config = WKWebViewConfiguration()
         webView = WKWebView(frame = view.bounds, configuration = config)
-        webView.customUserAgent = getSafariUserAgent()
+//        webView.customUserAgent = getSafariUserAgent()
+        webView.customUserAgent =
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
         webView.navigationDelegate = this
         view.addSubview(webView)
 
@@ -46,14 +48,9 @@ class OAuthWebViewController(
 
     private fun getSafariUserAgent(): String {
         val systemName = UIDevice.currentDevice.systemName
-        val systemVersion = UIDevice.currentDevice.systemVersion
+        val systemVersion = UIDevice.currentDevice.systemVersion.replace(".", "_")
         val model = UIDevice.currentDevice.model
-        return "Mozilla/5.0 ($model; CPU $systemName ${
-            systemVersion.replace(
-                ".",
-                "_",
-            )
-        } like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/605.1.15"
+        return "Mozilla/5.0 ($model; CPU $systemName $systemVersion like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/605.1.15"
     }
 
     @OptIn(ExperimentalForeignApi::class)

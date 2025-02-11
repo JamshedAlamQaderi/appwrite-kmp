@@ -41,11 +41,7 @@ fun App() {
             Button(onClick = {
                 scope.launch {
                     runCatching {
-                        account.createOAuth2Token(
-                            OAuthProvider.GOOGLE,
-                            success = "http://localhost:8080/",
-                            failure = "http://localhost:8080/fail",
-                        )
+                        account.createOAuth2Token(OAuthProvider.GOOGLE)
                     }.onFailure {
                         println("Exception: ${it.message}")
                     }

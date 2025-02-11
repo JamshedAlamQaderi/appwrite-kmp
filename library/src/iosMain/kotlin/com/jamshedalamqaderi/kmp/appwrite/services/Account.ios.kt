@@ -10,10 +10,8 @@ actual suspend fun launchOAuth2Url(
     callbackScheme: String,
 ): String =
     suspendCoroutine { cont ->
-        println("LaunchOAuth2Url")
         val oauthVC =
             OAuthWebViewController(authUrl, callbackScheme, onResult = { callbackUrl, error ->
-                println("Callback url: $callbackUrl | Error: $error")
                 when {
                     error != null -> cont.resumeWith(Result.failure(AppwriteException(error)))
                     callbackUrl == null ->

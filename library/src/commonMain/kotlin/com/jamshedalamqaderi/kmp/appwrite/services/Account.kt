@@ -1082,7 +1082,6 @@ class Account(client: Client) : Service(client) {
      * @param failure URL to redirect back to your app after a failed login attempt.  Only URLs from hostnames in your project's platform list are allowed. This requirement helps to prevent an [open redirect](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html) attack against your project API.
      * @param scopes A list of custom OAuth2 scopes. Check each provider internal docs for a list of supported scopes. Maximum of 100 scopes are allowed, each 4096 characters long.
      */
-    @JvmOverloads
     suspend fun createOAuth2Session(
         provider: OAuthProvider,
         success: String? = null,
@@ -1148,8 +1147,8 @@ class Account(client: Client) : Service(client) {
         val url = Url(client.endpoint)
         return createOAuth2Session(
             provider = provider,
-            success = "appwrite-project-${client.config["project"]}://${url.host}/auth/oauth2/success",
-            failure = "appwrite-project-${client.config["project"]}://${url.host}/auth/oauth2/failure",
+            success = "appwrite-callback-${client.config["project"]}://${url.host}/auth/oauth2/success",
+            failure = "appwrite-callback-${client.config["project"]}://${url.host}/auth/oauth2/failure",
             scopes = scopes,
         )
     }
@@ -1525,7 +1524,6 @@ class Account(client: Client) : Service(client) {
      * @param failure URL to redirect back to your app after a failed login attempt.  Only URLs from hostnames in your project's platform list are allowed. This requirement helps to prevent an [open redirect](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html) attack against your project API.
      * @param scopes A list of custom OAuth2 scopes. Check each provider internal docs for a list of supported scopes. Maximum of 100 scopes are allowed, each 4096 characters long.
      */
-    @JvmOverloads
     suspend fun createOAuth2Token(
         provider: OAuthProvider,
         success: String? = null,
@@ -1590,8 +1588,8 @@ class Account(client: Client) : Service(client) {
         val url = Url(client.endpoint)
         return createOAuth2Token(
             provider = provider,
-            success = "appwrite-project-${client.config["project"]}://${url.host}/auth/oauth2/success",
-            failure = "appwrite-project-${client.config["project"]}://${url.host}/auth/oauth2/failure",
+            success = "appwrite-callback-${client.config["project"]}://${url.host}/auth/oauth2/success",
+            failure = "appwrite-callback-${client.config["project"]}://${url.host}/auth/oauth2/failure",
             scopes = scopes,
         )
     }
