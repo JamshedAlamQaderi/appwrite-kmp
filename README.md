@@ -52,7 +52,7 @@ implementation("com.jamshedalamqaderi.kmp:appwrite-kmp:<LATEST_VERSION>")
    In your `MainActivity.kt`, add the following line to register the `AppwriteActivityLifecycleCallbacks`:
 
    ```kotlin
-   registerActivityLifecycleCallbacks(AppwriteActivityLifecycleCallbacks())
+   registerActivityLifecycleCallbacks(AppwriteActivityLifecycleCallbacks)
    ```
 
 ### iOS Setup
@@ -82,7 +82,7 @@ Replace `[project-id]` with your actual Appwrite project ID.
 To initialize the Appwrite client in your project, use the following code snippet:
 
 ```kotlin
-val client = Client(context)
+val client = Client()
   .setEndpoint("https://[HOSTNAME_OR_IP]/v1") // Replace with your API Endpoint
   .setProject("5df5acd0d48c2") // Replace with your Appwrite project ID
   .setSelfSigned(true) // Remove this in production if using self-signed certificates
