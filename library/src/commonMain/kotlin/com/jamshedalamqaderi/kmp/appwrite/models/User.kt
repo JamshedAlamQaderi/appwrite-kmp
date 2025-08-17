@@ -1,7 +1,9 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 /**
  * User
@@ -92,7 +94,7 @@ data class User<T>(
      * User preferences as a key-value object
      */
     @SerialName("prefs")
-    val prefs: Preferences<T>,
+    val prefs: T,
     /**
      * A user-owned message receiver. A single user may have multiple e.g. emails, phones, and a browser. Each target is registered with a single provider.
      */
@@ -104,3 +106,27 @@ data class User<T>(
     @SerialName("accessedAt")
     val accessedAt: String,
 )
+
+internal fun <T> User<JsonElement>.asPreferencesUser(deserializer: DeserializationStrategy<T>): User<Preferences<T>> {
+    return User(
+        id = id,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        name = name,
+        password = password,
+        hash = hash,
+        hashOptions = hashOptions,
+        registration = registration,
+        status = status,
+        labels = labels,
+        passwordUpdate = passwordUpdate,
+        email = email,
+        phone = phone,
+        emailVerification = emailVerification,
+        phoneVerification = phoneVerification,
+        mfa = mfa,
+        prefs = this.prefs.asPreferences(deserializer),
+        targets = targets,
+        accessedAt = accessedAt
+    )
+}

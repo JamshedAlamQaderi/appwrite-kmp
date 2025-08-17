@@ -7,25 +7,12 @@ import com.jamshedalamqaderi.kmp.appwrite.enums.AuthenticatorType
 import com.jamshedalamqaderi.kmp.appwrite.enums.OAuthProvider
 import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
 import com.jamshedalamqaderi.kmp.appwrite.extensions.mapSerializer
-import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
-import com.jamshedalamqaderi.kmp.appwrite.models.IdentityList
-import com.jamshedalamqaderi.kmp.appwrite.models.Jwt
-import com.jamshedalamqaderi.kmp.appwrite.models.LogList
-import com.jamshedalamqaderi.kmp.appwrite.models.MfaChallenge
-import com.jamshedalamqaderi.kmp.appwrite.models.MfaFactors
-import com.jamshedalamqaderi.kmp.appwrite.models.MfaRecoveryCodes
-import com.jamshedalamqaderi.kmp.appwrite.models.MfaType
-import com.jamshedalamqaderi.kmp.appwrite.models.Preferences
-import com.jamshedalamqaderi.kmp.appwrite.models.Session
-import com.jamshedalamqaderi.kmp.appwrite.models.SessionList
-import com.jamshedalamqaderi.kmp.appwrite.models.Target
-import com.jamshedalamqaderi.kmp.appwrite.models.Token
-import com.jamshedalamqaderi.kmp.appwrite.models.User
-import io.ktor.http.HttpMethod
-import io.ktor.http.Url
-import io.ktor.util.PlatformUtils
+import com.jamshedalamqaderi.kmp.appwrite.models.*
+import io.ktor.http.*
+import io.ktor.util.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.JsonElement
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
 
@@ -38,9 +25,9 @@ class Account(client: Client) : Service(client) {
      *
      * Get the currently logged in user.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
-    suspend fun <T> get(nestedType: KSerializer<T>): User<T> {
+    suspend fun <T> get(nestedType: KSerializer<T>): User<Preferences<T>> {
         val apiPath = "/account"
 
         val apiHeaders =
@@ -50,10 +37,10 @@ class Account(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Get,
             apiPath,
-            User.serializer(nestedType),
+            User.serializer(JsonElement.serializer()),
             apiHeaders,
             emptyList(),
-        )
+        ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -61,10 +48,10 @@ class Account(client: Client) : Service(client) {
      *
      * Get the currently logged in user.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<Preferences<Map<String, String>>>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
-    suspend fun get(): User<Map<String, String>> =
+    suspend fun get(): User<Preferences<Map<String, String>>> =
         get(
             nestedType = mapSerializer(),
         )
@@ -78,7 +65,7 @@ class Account(client: Client) : Service(client) {
      * @param email User email.
      * @param password New user password. Must be between 8 and 256 chars.
      * @param name User name. Max length: 128 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @JvmOverloads
     suspend fun <T> create(
@@ -87,7 +74,7 @@ class Account(client: Client) : Service(client) {
         password: String,
         name: String? = null,
         nestedType: KSerializer<T>,
-    ): User<T> {
+    ): User<Preferences<T>> {
         val apiPath = "/account"
 
         val apiParams =
@@ -104,10 +91,10 @@ class Account(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Post,
             apiPath,
-            User.serializer(nestedType),
+            User.serializer(JsonElement.serializer()),
             apiHeaders,
             apiParams,
-        )
+        ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -119,7 +106,7 @@ class Account(client: Client) : Service(client) {
      * @param email User email.
      * @param password New user password. Must be between 8 and 256 chars.
      * @param name User name. Max length: 128 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @JvmOverloads
     @Throws(AppwriteException::class, CancellationException::class)
@@ -128,7 +115,7 @@ class Account(client: Client) : Service(client) {
         email: String,
         password: String,
         name: String? = null,
-    ): User<Map<String, String>> =
+    ): User<Preferences<Map<String, String>>> =
         create(
             userId,
             email,
@@ -144,13 +131,13 @@ class Account(client: Client) : Service(client) {
      *
      * @param email User email.
      * @param password User password. Must be at least 8 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     suspend fun <T> updateEmail(
         email: String,
         password: String,
         nestedType: KSerializer<T>,
-    ): User<T> {
+    ): User<Preferences<T>> {
         val apiPath = "/account/email"
 
         val apiParams =
@@ -165,10 +152,10 @@ class Account(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Patch,
             apiPath,
-            User.serializer(nestedType),
+            User.serializer(JsonElement.serializer()),
             apiHeaders,
             apiParams,
-        )
+        ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -178,13 +165,13 @@ class Account(client: Client) : Service(client) {
      *
      * @param email User email.
      * @param password User password. Must be at least 8 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateEmail(
         email: String,
         password: String,
-    ): User<Map<String, String>> =
+    ): User<Preferences<Map<String, String>>> =
         updateEmail(
             email,
             password,
@@ -197,7 +184,7 @@ class Account(client: Client) : Service(client) {
      * Get the list of identities for the currently logged in user.
      *
      * @param queries Array of query strings generated using the Query class provided by the SDK. [Learn more about queries](https://appwrite.io/docs/queries). Maximum of 100 queries are allowed, each 4096 characters long. You may filter on the following attributes: userId, provider, providerUid, providerEmail, providerAccessTokenExpiry
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.IdentityList]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.IdentityList]
      */
     @JvmOverloads
     suspend fun listIdentities(queries: List<String>? = null): IdentityList {
@@ -252,7 +239,7 @@ class Account(client: Client) : Service(client) {
      *
      * Use this endpoint to create a JSON Web Token. You can use the resulting JWT to authenticate on behalf of the current user when working with the Appwrite server-side API and SDKs. The JWT secret is valid for 15 minutes from its creation and will be invalid if the user will logout in that time frame.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Jwt]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Jwt]
      */
     suspend fun createJWT(): Jwt {
         val apiPath = "/account/jwt"
@@ -276,7 +263,7 @@ class Account(client: Client) : Service(client) {
      * Get the list of latest security activity logs for the currently logged in user. Each log returns user IP address, location and date and time of log.
      *
      * @param queries Array of query strings generated using the Query class provided by the SDK. [Learn more about queries](https://appwrite.io/docs/queries). Only supported methods are limit and offset
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.LogList]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.LogList]
      */
     @JvmOverloads
     suspend fun listLogs(queries: List<String>? = null): LogList {
@@ -306,7 +293,7 @@ class Account(client: Client) : Service(client) {
      * Enable or disable MFA on an account.
      *
      * @param mfa Enable or disable MFA.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     suspend fun <T> updateMFA(
         mfa: Boolean,
@@ -338,7 +325,7 @@ class Account(client: Client) : Service(client) {
      * Enable or disable MFA on an account.
      *
      * @param mfa Enable or disable MFA.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateMFA(mfa: Boolean): User<Map<String, String>> =
@@ -353,7 +340,7 @@ class Account(client: Client) : Service(client) {
      * Add an authenticator app to be used as an MFA factor. Verify the authenticator using the [verify authenticator](/docs/references/cloud/client-web/account#updateMfaAuthenticator) method.
      *
      * @param type Type of authenticator. Must be `totp`
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.MfaType]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.MfaType]
      */
     suspend fun createMfaAuthenticator(type: AuthenticatorType): MfaType {
         val apiPath =
@@ -381,13 +368,13 @@ class Account(client: Client) : Service(client) {
      *
      * @param type Type of authenticator.
      * @param otp Valid verification token.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     suspend fun <T> updateMfaAuthenticator(
         type: AuthenticatorType,
         otp: String,
         nestedType: KSerializer<T>,
-    ): User<T> {
+    ): User<Preferences<T>> {
         val apiPath =
             "/account/mfa/authenticators/{type}"
                 .replace("{type}", type.value)
@@ -403,10 +390,10 @@ class Account(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Put,
             apiPath,
-            User.serializer(nestedType),
+            User.serializer(JsonElement.serializer()),
             apiHeaders,
             apiParams,
-        )
+        ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -416,13 +403,13 @@ class Account(client: Client) : Service(client) {
      *
      * @param type Type of authenticator.
      * @param otp Valid verification token.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateMfaAuthenticator(
         type: AuthenticatorType,
         otp: String,
-    ): User<Map<String, String>> =
+    ): User<Preferences<Map<String, String>>> =
         updateMfaAuthenticator(
             type,
             otp,
@@ -469,7 +456,7 @@ class Account(client: Client) : Service(client) {
      * Begin the process of MFA verification after sign-in. Finish the flow with [updateMfaChallenge](/docs/references/cloud/client-web/account#updateMfaChallenge) method.
      *
      * @param factor Factor used for verification. Must be one of following: `email`, `phone`, `totp`, `recoveryCode`.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.MfaChallenge]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.MfaChallenge]
      */
     suspend fun createMfaChallenge(factor: AuthenticationFactor): MfaChallenge {
         val apiPath = "/account/mfa/challenge"
@@ -530,7 +517,7 @@ class Account(client: Client) : Service(client) {
      *
      * List the factors available on the account to be used as a MFA challange.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.MfaFactors]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.MfaFactors]
      */
     suspend fun listMfaFactors(): MfaFactors {
         val apiPath = "/account/mfa/factors"
@@ -554,7 +541,7 @@ class Account(client: Client) : Service(client) {
      *
      * Get recovery codes that can be used as backup for MFA flow. Before getting codes, they must be generated using [createMfaRecoveryCodes](/docs/references/cloud/client-web/account#createMfaRecoveryCodes) method. An OTP challenge is required to read recovery codes.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.MfaRecoveryCodes]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.MfaRecoveryCodes]
      */
     suspend fun getMfaRecoveryCodes(): MfaRecoveryCodes {
         val apiPath = "/account/mfa/recovery-codes"
@@ -577,7 +564,7 @@ class Account(client: Client) : Service(client) {
      *
      * Generate recovery codes as backup for MFA flow. It&#039;s recommended to generate and show then immediately after user successfully adds their authehticator. Recovery codes can be used as a MFA verification type in [createMfaChallenge](/docs/references/cloud/client-web/account#createMfaChallenge) method.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.MfaRecoveryCodes]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.MfaRecoveryCodes]
      */
     suspend fun createMfaRecoveryCodes(): MfaRecoveryCodes {
         val apiPath = "/account/mfa/recovery-codes"
@@ -601,7 +588,7 @@ class Account(client: Client) : Service(client) {
      *
      * Regenerate recovery codes that can be used as backup for MFA flow. Before regenerating codes, they must be first generated using [createMfaRecoveryCodes](/docs/references/cloud/client-web/account#createMfaRecoveryCodes) method. An OTP challenge is required to regenreate recovery codes.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.MfaRecoveryCodes]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.MfaRecoveryCodes]
      */
     suspend fun updateMfaRecoveryCodes(): MfaRecoveryCodes {
         val apiPath = "/account/mfa/recovery-codes"
@@ -626,7 +613,7 @@ class Account(client: Client) : Service(client) {
      * Update currently logged in user account name.
      *
      * @param name User name. Max length: 128 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     suspend fun <T> updateName(
         name: String,
@@ -658,7 +645,7 @@ class Account(client: Client) : Service(client) {
      * Update currently logged in user account name.
      *
      * @param name User name. Max length: 128 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateName(name: String): User<Map<String, String>> =
@@ -674,7 +661,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param password New user password. Must be at least 8 chars.
      * @param oldPassword Current user password. Must be at least 8 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @JvmOverloads
     suspend fun <T> updatePassword(
@@ -710,7 +697,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param password New user password. Must be at least 8 chars.
      * @param oldPassword Current user password. Must be at least 8 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @JvmOverloads
     @Throws(AppwriteException::class, CancellationException::class)
@@ -731,7 +718,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param phone Phone number. Format this number with a leading '+' and a country code, e.g., +16175551212.
      * @param password User password. Must be at least 8 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     suspend fun <T> updatePhone(
         phone: String,
@@ -766,7 +753,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param phone Phone number. Format this number with a leading '+' and a country code, e.g., +16175551212.
      * @param password User password. Must be at least 8 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updatePhone(
@@ -784,7 +771,7 @@ class Account(client: Client) : Service(client) {
      *
      * Get the preferences as a key-value object for the currently logged in user.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Preferences<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Preferences<T>]
      */
     suspend fun <T> getPrefs(nestedType: KSerializer<T>): Preferences<T> {
         val apiPath = "/account/prefs"
@@ -797,10 +784,10 @@ class Account(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Get,
             apiPath,
-            Preferences.serializer(nestedType),
+            JsonElement.serializer(),
             apiHeaders,
             emptyList(),
-        )
+        ).asPreferences(nestedType)
     }
 
     /**
@@ -808,7 +795,7 @@ class Account(client: Client) : Service(client) {
      *
      * Get the preferences as a key-value object for the currently logged in user.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Preferences<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Preferences<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
     suspend fun getPrefs(): Preferences<Map<String, String>> =
@@ -822,12 +809,12 @@ class Account(client: Client) : Service(client) {
      * Update currently logged in user account preferences. The object you pass is stored as is, and replaces any previous value. The maximum allowed prefs size is 64kB and throws error if exceeded.
      *
      * @param prefs Prefs key-value JSON object.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     suspend fun <T> updatePrefs(
         prefs: Map<String, String>,
         nestedType: KSerializer<T>,
-    ): User<T> {
+    ): User<Preferences<T>> {
         val apiPath = "/account/prefs"
 
         val apiParams =
@@ -842,10 +829,10 @@ class Account(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Patch,
             apiPath,
-            User.serializer(nestedType),
+            User.serializer(JsonElement.serializer()),
             apiHeaders,
             apiParams,
-        )
+        ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -854,10 +841,10 @@ class Account(client: Client) : Service(client) {
      * Update currently logged in user account preferences. The object you pass is stored as is, and replaces any previous value. The maximum allowed prefs size is 64kB and throws error if exceeded.
      *
      * @param prefs Prefs key-value JSON object.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
-    suspend fun updatePrefs(prefs: Map<String, String>): User<Map<String, String>> =
+    suspend fun updatePrefs(prefs: Map<String, String>): User<Preferences<Map<String, String>>> =
         updatePrefs(
             prefs,
             nestedType = mapSerializer(),
@@ -870,7 +857,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param email User email.
      * @param url URL to redirect the user back to your app from the recovery email. Only URLs from hostnames in your project platform list are allowed. This requirement helps to prevent an [open redirect](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html) attack against your project API.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Token]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Token]
      */
     suspend fun createRecovery(
         email: String,
@@ -905,7 +892,7 @@ class Account(client: Client) : Service(client) {
      * @param userId User ID.
      * @param secret Valid reset token.
      * @param password New user password. Must be between 8 and 256 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Token]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Token]
      */
     suspend fun updateRecovery(
         userId: String,
@@ -939,7 +926,7 @@ class Account(client: Client) : Service(client) {
      *
      * Get the list of active sessions across different devices for the currently logged in user.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.SessionList]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.SessionList]
      */
     suspend fun listSessions(): SessionList {
         val apiPath = "/account/sessions"
@@ -985,7 +972,7 @@ class Account(client: Client) : Service(client) {
      *
      * Use this endpoint to allow a new user to register an anonymous account in your project. This route will also create a new session for the user. To allow the new user to convert an anonymous account to a normal account, you need to update its [email and password](https://appwrite.io/docs/references/cloud/client-web/account#updateEmail) or create an [OAuth2 session](https://appwrite.io/docs/references/cloud/client-web/account#CreateOAuth2Session).
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Session]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Session]
      */
     suspend fun createAnonymousSession(): Session {
         val apiPath = "/account/sessions/anonymous"
@@ -1011,7 +998,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param email User email.
      * @param password User password. Must be at least 8 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Session]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Session]
      */
     suspend fun createEmailPasswordSession(
         email: String,
@@ -1045,7 +1032,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param userId User ID. Choose a custom ID or generate a random ID with `ID.unique()`. Valid chars are a-z, A-Z, 0-9, period, hyphen, and underscore. Can't start with a special char. Max length is 36 chars.
      * @param secret Valid verification token.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Session]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Session]
      */
     suspend fun updateMagicURLSession(
         userId: String,
@@ -1160,7 +1147,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param userId User ID. Choose a custom ID or generate a random ID with `ID.unique()`. Valid chars are a-z, A-Z, 0-9, period, hyphen, and underscore. Can't start with a special char. Max length is 36 chars.
      * @param secret Valid verification token.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Session]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Session]
      */
     suspend fun updatePhoneSession(
         userId: String,
@@ -1194,7 +1181,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param userId User ID. Choose a custom ID or generate a random ID with `ID.unique()`. Valid chars are a-z, A-Z, 0-9, period, hyphen, and underscore. Can't start with a special char. Max length is 36 chars.
      * @param secret Secret of a token generated by login methods. For example, the `createMagicURLToken` or `createPhoneToken` methods.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Session]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Session]
      */
     suspend fun createSession(
         userId: String,
@@ -1227,7 +1214,7 @@ class Account(client: Client) : Service(client) {
      * Use this endpoint to get a logged in user&#039;s session using a Session ID. Inputting &#039;current&#039; will return the current session being used.
      *
      * @param sessionId Session ID. Use the string 'current' to get the current device session.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Session]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Session]
      */
     suspend fun getSession(sessionId: String): Session {
         val apiPath =
@@ -1254,7 +1241,7 @@ class Account(client: Client) : Service(client) {
      * Use this endpoint to extend a session&#039;s length. Extending a session is useful when session expiry is short. If the session was created using an OAuth provider, this endpoint refreshes the access token from the provider.
      *
      * @param sessionId Session ID. Use the string 'current' to update the current device session.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Session]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Session]
      */
     suspend fun updateSession(sessionId: String): Session {
         val apiPath =
@@ -1306,9 +1293,9 @@ class Account(client: Client) : Service(client) {
      *
      * Block the currently logged in user account. Behind the scene, the user record is not deleted but permanently blocked from any access. To completely delete a user, use the Users API instead.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
-    suspend fun <T> updateStatus(nestedType: KSerializer<T>): User<T> {
+    suspend fun <T> updateStatus(nestedType: KSerializer<T>): User<Preferences<T>> {
         val apiPath = "/account/status"
 
         val apiHeaders =
@@ -1319,10 +1306,10 @@ class Account(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Patch,
             apiPath,
-            User.serializer(nestedType),
+            User.serializer(JsonElement.serializer()),
             apiHeaders,
             emptyList(),
-        )
+        ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -1330,10 +1317,10 @@ class Account(client: Client) : Service(client) {
      *
      * Block the currently logged in user account. Behind the scene, the user record is not deleted but permanently blocked from any access. To completely delete a user, use the Users API instead.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.User<T>]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
-    suspend fun updateStatus(): User<Map<String, String>> =
+    suspend fun updateStatus(): User<Preferences<Map<String, String>>> =
         updateStatus(
             nestedType = mapSerializer(),
         )
@@ -1346,7 +1333,7 @@ class Account(client: Client) : Service(client) {
      * @param targetId Target ID. Choose a custom ID or generate a random ID with `ID.unique()`. Valid chars are a-z, A-Z, 0-9, period, hyphen, and underscore. Can't start with a special char. Max length is 36 chars.
      * @param identifier The target identifier (token, email, phone etc.)
      * @param providerId Provider ID. Message will be sent to this target from the specified provider ID. If no provider ID is set the first setup provider will be used.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Target]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Target]
      */
     @JvmOverloads
     suspend fun createPushTarget(
@@ -1369,7 +1356,7 @@ class Account(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Post,
             apiPath,
-            Target.serializer(),
+            kotlinx.serialization.serializer<Target>(),
             apiHeaders,
             apiParams,
         )
@@ -1382,7 +1369,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param targetId Target ID.
      * @param identifier The target identifier (token, email, phone etc.)
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Target]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Target]
      */
     suspend fun updatePushTarget(
         targetId: String,
@@ -1403,7 +1390,7 @@ class Account(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Put,
             apiPath,
-            Target.serializer(),
+            kotlinx.serialization.serializer<Target>(),
             apiHeaders,
             apiParams,
         )
@@ -1415,7 +1402,7 @@ class Account(client: Client) : Service(client) {
      *
      *
      * @param targetId Target ID.
-     * @return [Any]
+     * @return [Unit]
      */
     suspend fun deletePushTarget(targetId: String) {
         val apiPath =
@@ -1443,7 +1430,7 @@ class Account(client: Client) : Service(client) {
      * @param userId User ID. Choose a custom ID or generate a random ID with `ID.unique()`. Valid chars are a-z, A-Z, 0-9, period, hyphen, and underscore. Can't start with a special char. Max length is 36 chars.
      * @param email User email.
      * @param phrase Toggle for security phrase. If enabled, email will be send with a randomly generated phrase and the phrase will also be included in the response. Confirming phrases match increases the security of your authentication flow.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Token]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Token]
      */
     @JvmOverloads
     suspend fun createEmailToken(
@@ -1482,7 +1469,7 @@ class Account(client: Client) : Service(client) {
      * @param email User email.
      * @param url URL to redirect the user back to your app from the magic URL login. Only URLs from hostnames in your project platform list are allowed. This requirement helps to prevent an [open redirect](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html) attack against your project API.
      * @param phrase Toggle for security phrase. If enabled, email will be send with a randomly generated phrase and the phrase will also be included in the response. Confirming phrases match increases the security of your authentication flow.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Token]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Token]
      */
     @JvmOverloads
     suspend fun createMagicURLToken(
@@ -1601,7 +1588,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param userId Unique Id. Choose a custom ID or generate a random ID with `ID.unique()`. Valid chars are a-z, A-Z, 0-9, period, hyphen, and underscore. Can't start with a special char. Max length is 36 chars.
      * @param phone Phone number. Format this number with a leading '+' and a country code, e.g., +16175551212.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Token]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Token]
      */
     suspend fun createPhoneToken(
         userId: String,
@@ -1634,7 +1621,7 @@ class Account(client: Client) : Service(client) {
      * Use this endpoint to send a verification message to your user email address to confirm they are the valid owners of that address. Both the **userId** and **secret** arguments will be passed as query parameters to the URL you have provided to be attached to the verification email. The provided URL should redirect the user back to your app and allow you to complete the verification process by verifying both the **userId** and **secret** parameters. Learn more about how to [complete the verification process](https://appwrite.io/docs/references/cloud/client-web/account#updateVerification). The verification link sent to the user&#039;s email address is valid for 7 days.Please note that in order to avoid a [Redirect Attack](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.md), the only valid redirect URLs are the ones from domains you have set when adding your platforms in the console interface.
      *
      * @param url URL to redirect the user back to your app from the verification email. Only URLs from hostnames in your project platform list are allowed. This requirement helps to prevent an [open redirect](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html) attack against your project API.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Token]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Token]
      */
     suspend fun createVerification(url: String): Token {
         val apiPath = "/account/verification"
@@ -1664,7 +1651,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param userId User ID.
      * @param secret Valid verification token.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Token]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Token]
      */
     suspend fun updateVerification(
         userId: String,
@@ -1696,7 +1683,7 @@ class Account(client: Client) : Service(client) {
      *
      * Use this endpoint to send a verification SMS to the currently logged in user. This endpoint is meant for use after updating a user&#039;s phone number using the [accountUpdatePhone](https://appwrite.io/docs/references/cloud/client-web/account#updatePhone) endpoint. Learn more about how to [complete the verification process](https://appwrite.io/docs/references/cloud/client-web/account#updatePhoneVerification). The verification code sent to the user&#039;s phone number is valid for 15 minutes.
      *
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Token]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Token]
      */
     suspend fun createPhoneVerification(): Token {
         val apiPath = "/account/verification/phone"
@@ -1722,7 +1709,7 @@ class Account(client: Client) : Service(client) {
      *
      * @param userId User ID.
      * @param secret Valid verification token.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Token]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Token]
      */
     suspend fun updatePhoneVerification(
         userId: String,

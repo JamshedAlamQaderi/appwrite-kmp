@@ -52,16 +52,15 @@ data class Document<T>(
     val data: T,
 )
 
-fun <T> JsonElement.asDocument(deserializer: DeserializationStrategy<T>): Document<T> {
-    val keys =
-        listOf(
-            "\$id",
-            "\$collectionId",
-            "\$databaseId",
-            "\$createdAt",
-            "\$updatedAt",
-            "\$permissions",
-        )
+internal fun <T> JsonElement.asDocument(deserializer: DeserializationStrategy<T>): Document<T> {
+    val keys = listOf(
+        "\$id",
+        "\$collectionId",
+        "\$databaseId",
+        "\$createdAt",
+        "\$updatedAt",
+        "\$permissions",
+    )
     val dataObject =
         buildJsonObject {
             jsonObject.entries.forEach {

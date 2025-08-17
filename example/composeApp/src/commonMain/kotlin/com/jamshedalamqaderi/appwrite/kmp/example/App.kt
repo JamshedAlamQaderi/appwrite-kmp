@@ -26,8 +26,7 @@ fun App() {
     val client: Client =
         remember {
             Client()
-                .setEndpoint("https://")
-                .setProject("6797667e0013cde0eb41")
+                .setProject("68a1e08c00254a7e9714")
         }
     val account = remember(client) { Account(client) }
     val scope = rememberCoroutineScope()
@@ -41,18 +40,19 @@ fun App() {
             Button(onClick = {
                 scope.launch {
                     runCatching {
-                        account.createOAuth2Token(OAuthProvider.GOOGLE)
+                        account.createAnonymousSession()
                     }.onFailure {
                         println("Exception: ${it.message}")
                     }
                 }
             }) {
-                Text("Login with Google")
+                Text("Create Session")
             }
             Spacer(Modifier.height(20.dp))
             Button(onClick = {
                 scope.launch {
                     runCatching {
+                        account.updatePrefs(mapOf("blood_group" to "O+"))
                         val currentUser = account.get()
                         println("Current User: $currentUser")
                     }.onFailure {
