@@ -129,3 +129,10 @@ mavenPublishing {
         }
     }
 }
+
+// Gradle configuration cache is not supported for publishing to Maven Central yet.
+// See: https://github.com/gradle/gradle/issues/22779
+// Mark publish tasks as not compatible to avoid configuration cache error during publish.
+tasks.withType<org.gradle.api.publish.maven.tasks.PublishToMavenRepository>().configureEach {
+    notCompatibleWithConfigurationCache("Publishing to Maven Central is not supported with configuration caching yet")
+}
