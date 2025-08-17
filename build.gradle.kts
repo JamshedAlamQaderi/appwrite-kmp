@@ -20,7 +20,7 @@ subprojects {
 
     group = "com.jamshedalamqaderi.kmp"
     version = projectVersion?.replaceFirst("v", "", ignoreCase = true) ?: "0.0.1-SNAPSHOT"
-    println("Project version: $projectVersion")
+
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         filter {
             exclude {
