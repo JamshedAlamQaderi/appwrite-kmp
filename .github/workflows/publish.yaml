@@ -21,7 +21,7 @@ jobs:
           java-version: '17'
           check-latest: true
       - name: Publish to MavenCentral
-        run: ./gradlew :library:publishToMavenCentral --no-configuration-cache --no-daemon
+        run: ./gradlew :library:publish --no-configuration-cache --no-daemon
         env:
           ORG_GRADLE_PROJECT_projectVersion: ${{ github.ref_name }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
