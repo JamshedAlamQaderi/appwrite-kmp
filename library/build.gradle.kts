@@ -89,7 +89,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.jamshedalamqaderi.appwrite.kmp"
+    namespace = "com.jamshedalamqaderi.kmp.appwrite"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -101,7 +101,7 @@ mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
     signAllPublications()
-    coordinates(group.toString(), "appwrite-kmp", version.toString())
+    coordinates(group.toString(), "appwrite", version.toString())
 
     pom {
         name = "Appwrite KMP"
