@@ -25,7 +25,7 @@ A Kotlin Multiplatform (KMP) client for Appwrite, enabling seamless integration 
 Include the Appwrite KMP client dependency in your shared code. Add the following line to your `CommonMain/build.gradle.kts`:
 
 ```kotlin
-implementation("com.jamshedalamqaderi.kmp:appwrite-kmp:<LATEST_VERSION>")
+implementation("com.jamshedalamqaderi.kmp:appwrite:<LATEST_VERSION>")
 ```
 
 ### Android Setup
