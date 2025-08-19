@@ -13,12 +13,14 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish) apply false
 }
 
+val projectVersion: String? by project
+
 subprojects {
     apply(plugin = rootProject.libs.plugins.ktlint.get().pluginId)
 
     group = "com.jamshedalamqaderi.kmp"
-    version = project.property("version") as String
-
+    version = projectVersion?.replaceFirst("v", "", ignoreCase = true) ?: "0.0.1-SNAPSHOT"
+    
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         filter {
             exclude {

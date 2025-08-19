@@ -1,5 +1,5 @@
 # Appwrite KMP SDK
-[![Maven Central](https://img.shields.io/maven-central/v/com.jamshedalamqaderi.kmp/appwrite-kmp)](https://search.maven.org/artifact/com.jamshedalamqaderi.kmp/appwrite-kmp)
+[![Maven Central](https://img.shields.io/maven-central/v/com.jamshedalamqaderi.kmp/appwrite)](https://search.maven.org/artifact/com.jamshedalamqaderi.kmp/appwrite)
 
 A Kotlin Multiplatform (KMP) client for Appwrite, enabling seamless integration with Appwrite's backend services in your KMP projects. This client is designed to work with Android, iOS, and other platforms supported by Kotlin Multiplatform.
 
