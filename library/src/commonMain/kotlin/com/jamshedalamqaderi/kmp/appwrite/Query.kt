@@ -1,7 +1,9 @@
 package com.jamshedalamqaderi.kmp.appwrite
 
 import com.jamshedalamqaderi.kmp.appwrite.extensions.toJson
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationStrategy
 
 @Serializable
 data class Query<T>(
@@ -20,27 +22,32 @@ data class Query<T>(
         fun <T> notEqual(
             attribute: String,
             value: T,
-        ) = Query("notEqual", attribute, listOf(value)).toJson()
+            nestedType: KSerializer<T>
+        ) = Query("notEqual", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun <T> lessThan(
             attribute: String,
             value: T,
-        ) = Query("lessThan", attribute, listOf(value)).toJson()
+            nestedType: KSerializer<T>
+        ) = Query("lessThan", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun <T> lessThanEqual(
             attribute: String,
             value: T,
-        ) = Query("lessThanEqual", attribute, listOf(value)).toJson()
+            nestedType: KSerializer<T>
+        ) = Query("lessThanEqual", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun <T> greaterThan(
             attribute: String,
             value: T,
-        ) = Query("greaterThan", attribute, listOf(value)).toJson()
+            nestedType: KSerializer<T>
+        ) = Query("greaterThan", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun <T> greaterThanEqual(
             attribute: String,
             value: T,
-        ) = Query("greaterThanEqual", attribute, listOf(value)).toJson()
+            nestedType: KSerializer<T>
+        ) = Query("greaterThanEqual", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun search(
             attribute: String,
@@ -55,7 +62,8 @@ data class Query<T>(
             attribute: String,
             start: T,
             end: T,
-        ) = Query("between", attribute, listOf(start, end)).toJson()
+            nestedType: KSerializer<T>
+        ) = Query("between", attribute, listOf(start, end)).toJson(serializer(nestedType))
 
         fun startsWith(
             attribute: String,
