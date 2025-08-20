@@ -1,9 +1,10 @@
 package com.jamshedalamqaderi.kmp.appwrite
 
+import com.jamshedalamqaderi.kmp.appwrite.extensions.fromJson
 import com.jamshedalamqaderi.kmp.appwrite.extensions.toJson
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class Query<T>(
@@ -94,8 +95,16 @@ data class Query<T>(
             value: String,
         ) = Query("contains", attribute, listOf(value)).toJson()
 
-        fun or(queries: List<String>) = Query("or", null, queries).toJson()
+        fun or(queries: List<String>) = Query(
+            "or",
+            null,
+            queries.map { it.fromJson(serializer(JsonElement.serializer())) }
+        ).toJson()
 
-        fun and(queries: List<String>) = Query("and", null, queries).toJson()
+        fun and(queries: List<String>) = Query(
+            "and",
+            null,
+            queries.map { it.fromJson(serializer(JsonElement.serializer())) }
+        ).toJson()
     }
 }
