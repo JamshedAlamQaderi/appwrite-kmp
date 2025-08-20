@@ -8,7 +8,7 @@ import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
 import com.jamshedalamqaderi.kmp.appwrite.models.Document
 import com.jamshedalamqaderi.kmp.appwrite.models.DocumentList
 import com.jamshedalamqaderi.kmp.appwrite.models.asDocument
-import io.ktor.http.HttpMethod
+import io.ktor.http.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement

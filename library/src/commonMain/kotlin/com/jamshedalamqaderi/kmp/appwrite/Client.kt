@@ -6,27 +6,16 @@ import com.jamshedalamqaderi.kmp.appwrite.extensions.json
 import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
 import com.jamshedalamqaderi.kmp.appwrite.models.Progress
 import com.jamshedalamqaderi.kmp.appwrite.stores.CachedCookiesStorage
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.cookies.HttpCookies
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.plugins.onDownload
-import io.ktor.client.plugins.onUpload
-import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.client.plugins.websocket.pingInterval
-import io.ktor.client.request.forms.InputProvider
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
-import io.ktor.client.request.parameter
-import io.ktor.client.request.request
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
+import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.cookies.*
+import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.websocket.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,13 +23,9 @@ import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.addAll
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
-import kotlinx.serialization.json.putJsonObject
-import kotlin.collections.set
+import kotlinx.serialization.json.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
@@ -211,6 +196,7 @@ class Client(
      *
      * @return String
      */
+    @Suppress("UNCHECKED_CAST")
     @OptIn(ExperimentalSerializationApi::class)
     @Throws(AppwriteException::class, CancellationException::class)
     suspend fun <T> call(
@@ -334,7 +320,11 @@ class Client(
                 }
             }.bodyAsText()
         return try {
-            response.fromJson(deserializer)
+            if (deserializer == Unit.serializer()) {
+                Unit as T
+            } else {
+                response.fromJson(deserializer)
+            }
         } catch (_: Exception) {
             throw response.fromJson<AppwriteException>()
         }

@@ -11,11 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jamshedalamqaderi.kmp.appwrite.Client
-import com.jamshedalamqaderi.kmp.appwrite.Query
+import com.jamshedalamqaderi.kmp.appwrite.ID
 import com.jamshedalamqaderi.kmp.appwrite.services.Account
 import com.jamshedalamqaderi.kmp.appwrite.services.Databases
 import kotlinx.coroutines.launch
-import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 const val DB_ID = "68a459b400178f65fb13"
@@ -42,7 +43,7 @@ fun App() {
             Button(onClick = {
                 scope.launch {
                     runCatching {
-                        account.createAnonymousSession()
+                        println("Session: ${account.createEmailPasswordSession("example@gmail.com", "abcd13579")}")
                     }.onFailure {
                         println("Exception: ${it.message}")
                     }
@@ -54,14 +55,22 @@ fun App() {
             Button(onClick = {
                 scope.launch {
                     runCatching {
-                        val docs = database.listDocuments(
+                        val doc = database.createDocument(
                             databaseId = DB_ID,
                             collectionId = STUDENT_COLLECTION,
-                            queries = listOf(
-                                Query.notEqual("name", "Jamshed", String.serializer()),
-                            )
+                            documentId = ID.unique(),
+                            data = buildJsonObject {
+                                put("name", "Jamshed")
+                                put("roll", 29)
+                            }
                         )
-                        println("Docs: $docs")
+                        println("created doc: $doc")
+                        database.deleteDocument(
+                            databaseId = DB_ID,
+                            collectionId = STUDENT_COLLECTION,
+                            documentId = doc.id
+                        )
+                        println("deleted doc: $doc")
                     }.onFailure {
                         println("Exception while retrieving current user: ${it.message}")
                     }
