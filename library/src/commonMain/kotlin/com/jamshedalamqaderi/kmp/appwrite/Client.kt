@@ -23,6 +23,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
@@ -318,15 +319,17 @@ class Client(
                         }
                     }
                 }
-            }.bodyAsText()
+            }
         return try {
             if (deserializer == Unit.serializer()) {
                 Unit as T
+            } else if (deserializer == ByteArraySerializer()) {
+                response.bodyAsBytes() as T
             } else {
-                response.fromJson(deserializer)
+                response.bodyAsText().fromJson(deserializer)
             }
         } catch (_: Exception) {
-            throw response.fromJson<AppwriteException>()
+            throw response.bodyAsText().fromJson<AppwriteException>()
         }
     }
 
