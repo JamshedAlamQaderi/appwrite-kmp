@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 /**
  * Documents List
  */
+@Deprecated("Use TableDB instead.", replaceWith = ReplaceWith("RowList"))
 @Serializable
 data class DocumentList<T>(
     /**
