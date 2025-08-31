@@ -9,7 +9,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.url.URL
 
-internal actual fun httpEngine(): HttpClientEngine = Js.create()
+internal actual fun httpEngine(selfSigned: Boolean): HttpClientEngine = Js.create()
 
 internal actual fun defaultHeaders(): MutableMap<String, String> {
     return mutableMapOf(
@@ -17,8 +17,8 @@ internal actual fun defaultHeaders(): MutableMap<String, String> {
         "x-sdk-name" to "Web",
         "x-sdk-platform" to "client",
         "x-sdk-language" to "kotlin",
-        "x-sdk-version" to "5.1.1",
-        "x-appwrite-response-format" to "1.5.7",
+        "x-sdk-version" to "19.0.0",
+        "x-appwrite-response-format" to "1.8.0",
     )
 }
 

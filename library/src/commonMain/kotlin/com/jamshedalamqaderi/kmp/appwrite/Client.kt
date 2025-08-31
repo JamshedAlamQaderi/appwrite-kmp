@@ -376,7 +376,7 @@ class Client(
     internal fun createOrGetClient(): HttpClient {
         if (!updated) return http
         http =
-            HttpClient(httpEngine()) {
+            HttpClient(httpEngine(selfSigned)) {
                 install(ContentNegotiation) {
                     json(Json { ignoreUnknownKeys = true })
                 }
@@ -405,7 +405,7 @@ class Client(
     }
 }
 
-internal expect fun httpEngine(): HttpClientEngine
+internal expect fun httpEngine(selfSigned: Boolean): HttpClientEngine
 
 internal expect fun defaultHeaders(): MutableMap<String, String>
 
