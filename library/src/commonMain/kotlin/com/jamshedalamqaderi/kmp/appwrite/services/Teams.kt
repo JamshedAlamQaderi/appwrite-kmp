@@ -3,15 +3,15 @@ package com.jamshedalamqaderi.kmp.appwrite.services
 import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
 import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
+import com.jamshedalamqaderi.kmp.appwrite.extensions.fromJson
 import com.jamshedalamqaderi.kmp.appwrite.extensions.mapSerializer
-import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
-import com.jamshedalamqaderi.kmp.appwrite.models.Membership
-import com.jamshedalamqaderi.kmp.appwrite.models.MembershipList
-import com.jamshedalamqaderi.kmp.appwrite.models.Preferences
-import com.jamshedalamqaderi.kmp.appwrite.models.Team
-import com.jamshedalamqaderi.kmp.appwrite.models.TeamList
-import io.ktor.http.HttpMethod
+import com.jamshedalamqaderi.kmp.appwrite.models.*
+import io.ktor.client.call.*
+import io.ktor.client.statement.*
+import com.jamshedalamqaderi.kmp.appwrite.extensions.json
+import io.ktor.http.*
 import kotlinx.serialization.KSerializer
+import com.jamshedalamqaderi.kmp.appwrite.extensions.jsonCast
 import kotlinx.serialization.json.JsonElement
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
@@ -37,22 +37,20 @@ class Teams(client: Client) : Service(client) {
     ): TeamList<T> {
         val apiPath = "/teams"
 
-        val apiParams =
-            listOf(
-                ClientParam.ListParam("queries", queries ?: emptyList()),
-                ClientParam.StringParam("search", search),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = buildMap {
+            put("queries", queries ?: emptyList<String>())
+            if (search != null) put("search", search)
+        }
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
-            TeamList.serializer(nestedType),
             apiHeaders,
             apiParams,
+            converter = { json.decodeFromJsonElement(TeamList.serializer(nestedType), it.body<JsonElement>()) }
         )
     }
 
@@ -96,23 +94,21 @@ class Teams(client: Client) : Service(client) {
     ): Team<T> {
         val apiPath = "/teams"
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("teamId", teamId),
-                ClientParam.StringParam("name", name),
-                ClientParam.ListParam("roles", roles ?: emptyList()),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
+        val params = buildMap<String, Any> {
+            put("teamId", teamId)
+            put("name", name)
+            put("roles", roles ?: emptyList<String>())
+        }
         return client.call(
             HttpMethod.Post,
             apiPath,
-            Team.serializer(nestedType),
             apiHeaders,
-            apiParams,
+            params,
+            converter = { json.decodeFromJsonElement(Team.serializer(nestedType), it.body<JsonElement>()) }
         )
     }
 
@@ -164,8 +160,9 @@ class Teams(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Get,
             apiPath,
-            Team.serializer(nestedType),
             apiHeaders,
+            emptyMap(),
+            converter = { json.decodeFromJsonElement(Team.serializer(nestedType), it.body<JsonElement>()) }
         )
     }
 
@@ -202,21 +199,18 @@ class Teams(client: Client) : Service(client) {
             "/teams/{teamId}"
                 .replace("{teamId}", teamId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("name", name),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
-
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
+        val apiParams = mapOf(
+            "name" to name
+        )
         return client.call(
             HttpMethod.Put,
             apiPath,
-            Team.serializer(nestedType),
             apiHeaders,
             apiParams,
+            converter = { json.decodeFromJsonElement(Team.serializer(nestedType), it.body<JsonElement>()) }
         )
     }
 
@@ -253,15 +247,15 @@ class Teams(client: Client) : Service(client) {
             "/teams/{teamId}"
                 .replace("{teamId}", teamId)
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Delete,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<JsonElement>() }
         )
     }
 
@@ -285,22 +279,20 @@ class Teams(client: Client) : Service(client) {
             "/teams/{teamId}/memberships"
                 .replace("{teamId}", teamId)
 
-        val apiParams =
-            listOf(
-                ClientParam.ListParam("queries", queries ?: emptyList()),
-                ClientParam.StringParam("search", search),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = buildMap<String, Any> {
+            put("queries", queries ?: emptyList<String>())
+            if (search != null) put("search", search)
+        }
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
-            MembershipList.serializer(),
             apiHeaders,
             apiParams,
+            converter = { it.body<MembershipList>() }
         )
     }
 
@@ -332,26 +324,24 @@ class Teams(client: Client) : Service(client) {
             "/teams/{teamId}/memberships"
                 .replace("{teamId}", teamId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("email", email),
-                ClientParam.StringParam("userId", userId),
-                ClientParam.StringParam("phone", phone),
-                ClientParam.ListParam("roles", roles),
-                ClientParam.StringParam("url", url),
-                ClientParam.StringParam("name", name),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = buildMap<String, Any> {
+            if (email != null) put("email", email)
+            if (userId != null) put("userId", userId)
+            if (phone != null) put("phone", phone)
+            put("roles", roles)
+            if (url != null) put("url", url)
+            if (name != null) put("name", name)
+        }
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
-            Membership.serializer(),
             apiHeaders,
             apiParams,
+            converter = { it.body<Membership>() }
         )
     }
 
@@ -381,8 +371,9 @@ class Teams(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Get,
             apiPath,
-            Membership.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<Membership>() }
         )
     }
 
@@ -406,21 +397,19 @@ class Teams(client: Client) : Service(client) {
                 .replace("{teamId}", teamId)
                 .replace("{membershipId}", membershipId)
 
-        val apiParams =
-            listOf(
-                ClientParam.ListParam("roles", roles),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf(
+            "roles" to roles
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Patch,
             apiPath,
-            Membership.serializer(),
             apiHeaders,
             apiParams,
+            converter = { it.body<Membership>() }
         )
     }
 
@@ -449,8 +438,9 @@ class Teams(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Delete,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<JsonElement>() }
         )
     }
 
@@ -476,22 +466,20 @@ class Teams(client: Client) : Service(client) {
                 .replace("{teamId}", teamId)
                 .replace("{membershipId}", membershipId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("userId", userId),
-                ClientParam.StringParam("secret", secret),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf(
+            "userId" to userId,
+            "secret" to secret,
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Patch,
             apiPath,
-            Membership.serializer(),
             apiHeaders,
             apiParams,
+            converter = { it.body<Membership>() }
         )
     }
 
@@ -519,8 +507,9 @@ class Teams(client: Client) : Service(client) {
         return client.call(
             HttpMethod.Get,
             apiPath,
-            Preferences.serializer(nestedType),
             apiHeaders,
+            emptyMap(),
+            converter = { json.decodeFromJsonElement(Preferences.serializer(nestedType), it.body<JsonElement>()) }
         )
     }
 
@@ -557,21 +546,19 @@ class Teams(client: Client) : Service(client) {
             "/teams/{teamId}/prefs"
                 .replace("{teamId}", teamId)
 
-        val apiParams =
-            listOf(
-                ClientParam.MapParam("prefs", prefs),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf(
+            "prefs" to prefs
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Put,
             apiPath,
-            Preferences.serializer(nestedType),
             apiHeaders,
             apiParams,
+            converter = { json.decodeFromJsonElement(Preferences.serializer(nestedType), it.body<JsonElement>()) }
         )
     }
 

@@ -15,6 +15,7 @@ import com.jamshedalamqaderi.kmp.appwrite.Query
 import com.jamshedalamqaderi.kmp.appwrite.services.Account
 import com.jamshedalamqaderi.kmp.appwrite.services.Databases
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonElement
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 const val DB_ID = "68a459b400178f65fb13"
@@ -23,11 +24,9 @@ const val STUDENT_COLLECTION = "68a459c20031a865d804"
 @Composable
 @Preview
 fun App() {
-    val client: Client =
-        remember {
-            Client()
-                .setProject("68a1e08c00254a7e9714")
-        }
+    val client: Client = remember {
+        Client().setProject("68a1e08c00254a7e9714")
+    }
     val account = remember(client) { Account(client) }
     val database = remember(client) { Databases(client) }
     val scope = rememberCoroutineScope()
@@ -71,12 +70,6 @@ fun App() {
                         )
                         println("Or Queries: $orQueries")
                         println("And Queries: $andQueries")
-                        val docs = database.listDocuments(
-                            databaseId = DB_ID,
-                            collectionId = STUDENT_COLLECTION,
-                            queries =orQueries
-                        )
-                        println("Docs Queries: $docs")
                     }.onFailure {
                         println("Exception while retrieving current user: ${it.message}")
                     }

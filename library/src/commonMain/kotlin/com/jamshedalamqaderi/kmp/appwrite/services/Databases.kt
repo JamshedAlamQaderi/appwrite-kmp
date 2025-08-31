@@ -4,13 +4,12 @@ import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
 import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
 import com.jamshedalamqaderi.kmp.appwrite.extensions.json
-import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
 import com.jamshedalamqaderi.kmp.appwrite.models.Document
 import com.jamshedalamqaderi.kmp.appwrite.models.DocumentList
 import com.jamshedalamqaderi.kmp.appwrite.models.asDocument
+import io.ktor.client.call.*
 import io.ktor.http.*
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
@@ -42,23 +41,20 @@ class Databases(client: Client) : Service(client) {
                 .replace("{databaseId}", databaseId)
                 .replace("{collectionId}", collectionId)
 
-        val apiParams =
-            listOf(
-                ClientParam.ListParam("queries", queries ?: emptyList()),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf<String, Any>(
+            "queries" to (queries ?: emptyList())
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
-        val documents =
-            client.call(
-                HttpMethod.Get,
-                apiPath,
-                DocumentList.serializer(JsonElement.serializer()),
-                apiHeaders,
-                apiParams,
-            )
+        val documents = client.call(
+            HttpMethod.Get,
+            apiPath,
+            apiHeaders,
+            apiParams,
+            converter = { it.body<DocumentList<JsonElement>>() }
+        )
         return DocumentList(
             total = documents.total,
             documents = documents.documents.map { it.asDocument(nestedType) },
@@ -115,24 +111,23 @@ class Databases(client: Client) : Service(client) {
                 .replace("{databaseId}", databaseId)
                 .replace("{collectionId}", collectionId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("documentId", documentId),
-                ClientParam.StringParam("data", json.encodeToString(nestedType, data)),
-                ClientParam.ListParam("permissions", permissions ?: emptyList()),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf(
+            "documentId" to documentId,
+            "data" to json.encodeToString(nestedType, data),
+            "permissions" to (permissions ?: emptyList<String>())
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
-        return client.call(
+        val response = client.call(
             HttpMethod.Post,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
             apiParams,
-        ).asDocument(nestedType)
+            converter = { it.body<JsonElement>() }
+        )
+        return response.asDocument(nestedType)
     }
 
     /**
@@ -155,15 +150,14 @@ class Databases(client: Client) : Service(client) {
         documentId: String,
         data: JsonElement,
         permissions: List<String>? = null,
-    ): Document<JsonElement> =
-        createDocument(
-            databaseId,
-            collectionId,
-            documentId,
-            data,
-            permissions,
-            nestedType = JsonElement.serializer(),
-        )
+    ): Document<JsonElement> = createDocument(
+        databaseId,
+        collectionId,
+        documentId,
+        data,
+        permissions,
+        nestedType = JsonElement.serializer(),
+    )
 
     /**
      * Get document
@@ -190,22 +184,21 @@ class Databases(client: Client) : Service(client) {
                 .replace("{collectionId}", collectionId)
                 .replace("{documentId}", documentId)
 
-        val apiParams =
-            listOf(
-                ClientParam.ListParam("queries", queries ?: emptyList()),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf<String, Any>(
+            "queries" to (queries ?: emptyList())
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
-        return client.call(
+        val response = client.call(
             HttpMethod.Get,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
             apiParams,
-        ).asDocument(nestedType)
+            converter = { it.body<JsonElement>() }
+        )
+        return response.asDocument(nestedType)
     }
 
     /**
@@ -226,14 +219,13 @@ class Databases(client: Client) : Service(client) {
         collectionId: String,
         documentId: String,
         queries: List<String>? = null,
-    ): Document<JsonElement> =
-        getDocument(
-            databaseId,
-            collectionId,
-            documentId,
-            queries,
-            nestedType = JsonElement.serializer(),
-        )
+    ): Document<JsonElement> = getDocument(
+        databaseId,
+        collectionId,
+        documentId,
+        queries,
+        nestedType = JsonElement.serializer(),
+    )
 
     /**
      * Update document
@@ -262,23 +254,22 @@ class Databases(client: Client) : Service(client) {
                 .replace("{collectionId}", collectionId)
                 .replace("{documentId}", documentId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("data", json.encodeToString(nestedType, data)),
-                ClientParam.ListParam("permissions", permissions ?: emptyList()),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf(
+            "data" to json.encodeToString(nestedType, data),
+            "permissions" to (permissions ?: emptyList())
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
-        return client.call(
+        val response = client.call(
             HttpMethod.Patch,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
             apiParams,
-        ).asDocument(nestedType)
+            converter = { it.body<JsonElement>() }
+        )
+        return response.asDocument(nestedType)
     }
 
     /**
@@ -301,15 +292,14 @@ class Databases(client: Client) : Service(client) {
         documentId: String,
         data: JsonElement,
         permissions: List<String>? = null,
-    ): Document<JsonElement> =
-        updateDocument(
-            databaseId,
-            collectionId,
-            documentId,
-            data,
-            permissions,
-            nestedType = JsonElement.serializer(),
-        )
+    ): Document<JsonElement> = updateDocument(
+        databaseId,
+        collectionId,
+        documentId,
+        data,
+        permissions,
+        nestedType = JsonElement.serializer(),
+    )
 
     /**
      * Delete document
@@ -332,16 +322,15 @@ class Databases(client: Client) : Service(client) {
                 .replace("{collectionId}", collectionId)
                 .replace("{documentId}", documentId)
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Delete,
             apiPath,
-            Unit.serializer(),
             apiHeaders,
-            emptyList(),
+            emptyMap(),
+            converter = { }
         )
     }
 }

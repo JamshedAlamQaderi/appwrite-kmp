@@ -4,7 +4,7 @@ import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
 import com.jamshedalamqaderi.kmp.appwrite.enums.ImageFormat
 import com.jamshedalamqaderi.kmp.appwrite.enums.ImageGravity
-import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
+import io.ktor.client.call.*
 import com.jamshedalamqaderi.kmp.appwrite.models.File
 import com.jamshedalamqaderi.kmp.appwrite.models.FileList
 import com.jamshedalamqaderi.kmp.appwrite.models.Progress

@@ -3,7 +3,7 @@ package com.jamshedalamqaderi.kmp.appwrite.services
 import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
 import com.jamshedalamqaderi.kmp.appwrite.enums.ExecutionMethod
-import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
+import io.ktor.client.call.*
 import com.jamshedalamqaderi.kmp.appwrite.models.Execution
 import com.jamshedalamqaderi.kmp.appwrite.models.ExecutionList
 import io.ktor.http.HttpMethod
@@ -33,21 +33,19 @@ class Functions(client: Client) : Service(client) {
             "/functions/{functionId}/executions"
                 .replace("{functionId}", functionId)
 
-        val apiParams =
-            listOf(
-                ClientParam.ListParam("queries", queries ?: emptyList()),
-                ClientParam.StringParam("search", search),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = buildMap<String, Any> {
+            put("queries", queries ?: emptyList<String>())
+            if (search != null) put("search", search)
+        }
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Get,
             apiPath,
-            ExecutionList.serializer(),
             apiHeaders,
             apiParams,
+            converter = { it.body<ExecutionList>() }
         )
     }
 
@@ -79,25 +77,23 @@ class Functions(client: Client) : Service(client) {
             "/functions/{functionId}/executions"
                 .replace("{functionId}", functionId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("body", body),
-                ClientParam.StringParam("async", async?.toString()),
-                ClientParam.StringParam("path", path),
-                ClientParam.StringParam("method", method?.value),
-                ClientParam.MapParam("headers", headers ?: mapOf()),
-                ClientParam.StringParam("scheduledAt", scheduledAt),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = buildMap<String, Any> {
+            if (body != null) put("body", body)
+            if (async != null) put("async", async)
+            if (path != null) put("path", path)
+            if (method != null) put("method", method.value)
+            put("headers", headers ?: emptyMap<String, String>())
+            if (scheduledAt != null) put("scheduledAt", scheduledAt)
+        }
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Post,
             apiPath,
-            Execution.serializer(),
             apiHeaders,
             apiParams,
+            converter = { it.body<Execution>() }
         )
     }
 
@@ -119,15 +115,15 @@ class Functions(client: Client) : Service(client) {
                 .replace("{functionId}", functionId)
                 .replace("{executionId}", executionId)
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Get,
             apiPath,
-            Execution.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<Execution>() }
         )
     }
 }
