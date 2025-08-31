@@ -4,6 +4,7 @@ import com.jamshedalamqaderi.kmp.appwrite.extensions.fromJson
 import com.jamshedalamqaderi.kmp.appwrite.extensions.toJson
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
 
 @Serializable
@@ -18,7 +19,13 @@ data class Query<T>(
         fun equal(
             attribute: String,
             value: String,
-        ) = Query("equal", attribute, listOf(value)).toJson()
+        ) = equal(attribute, value, String.serializer())
+
+        fun <T> equal(
+            attribute: String,
+            value: T,
+            nestedType: KSerializer<T>,
+        ) = Query("equal", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun <T> notEqual(
             attribute: String,
@@ -93,7 +100,54 @@ data class Query<T>(
         fun contains(
             attribute: String,
             value: String,
-        ) = Query("contains", attribute, listOf(value)).toJson()
+        ) = contains(attribute, value, String.serializer())
+
+        fun <T> contains(
+            attribute: String,
+            value: T,
+            nestedType: KSerializer<T>,
+        ) = Query("contains", attribute, listOf(value)).toJson(serializer(nestedType))
+
+        fun notContains(
+            attribute: String,
+            value: String,
+        ) = notContains(attribute, value, String.serializer())
+
+        fun <T> notContains(
+            attribute: String,
+            value: T,
+            nestedType: KSerializer<T>,
+        ) = Query("notContains", attribute, listOf(value)).toJson(serializer(nestedType))
+
+        fun notSearch(
+            attribute: String,
+            value: String,
+        ) = Query("notSearch", attribute, listOf(value)).toJson()
+
+        fun <T> notBetween(
+            attribute: String,
+            start: T,
+            end: T,
+            nestedType: KSerializer<T>,
+        ) = Query("notBetween", attribute, listOf(start, end)).toJson(serializer(nestedType))
+
+        fun notStartsWith(
+            attribute: String,
+            value: String,
+        ) = Query("notStartsWith", attribute, listOf(value)).toJson()
+
+        fun notEndsWith(
+            attribute: String,
+            value: String,
+        ) = Query("notEndsWith", attribute, listOf(value)).toJson()
+
+        fun createdBefore(value: String) = Query<String>("createdBefore", null, listOf(value)).toJson()
+
+        fun createdAfter(value: String) = Query<String>("createdAfter", null, listOf(value)).toJson()
+
+        fun updatedBefore(value: String) = Query<String>("updatedBefore", null, listOf(value)).toJson()
+
+        fun updatedAfter(value: String) = Query<String>("updatedAfter", null, listOf(value)).toJson()
 
         fun or(queries: List<String>) =
             Query(
