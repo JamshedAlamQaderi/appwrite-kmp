@@ -2,11 +2,47 @@ package com.jamshedalamqaderi.kmp.appwrite
 
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.darwin.Darwin
+import kotlinx.cinterop.BetaInteropApi
 import platform.Foundation.NSBundle
 import platform.Foundation.NSProcessInfo
+import platform.Foundation.NSURLAuthenticationChallenge
+import platform.Foundation.NSURLAuthenticationMethodServerTrust
+import platform.Foundation.NSURLCredential
+import platform.Foundation.NSURLSession
+import platform.Foundation.NSURLSessionAuthChallengePerformDefaultHandling
+import platform.Foundation.NSURLSessionAuthChallengeUseCredential
+import platform.Foundation.NSURLSessionTask
+import platform.Foundation.create
+import platform.Foundation.serverTrust
 import platform.UIKit.UIDevice
 
-internal actual fun httpEngine(selfSigned: Boolean): HttpClientEngine = Darwin.create()
+@OptIn(BetaInteropApi::class)
+@Suppress("MISSING_DEPENDENCY_CLASS_IN_EXPRESSION_TYPE")
+internal actual fun httpEngine(selfSigned: Boolean): HttpClientEngine = Darwin.create {
+    if (selfSigned) {
+        val useCredential = NSURLSessionAuthChallengeUseCredential.toInt()
+        val performDefault = NSURLSessionAuthChallengePerformDefaultHandling.toInt()
+        handleChallenge { _: NSURLSession, _: NSURLSessionTask?, challenge: NSURLAuthenticationChallenge, completionHandler ->
+            val method = challenge.protectionSpace.authenticationMethod
+            if (method == NSURLAuthenticationMethodServerTrust) {
+                val trust = challenge.protectionSpace.serverTrust
+                if (trust != null) {
+                    val credential = NSURLCredential.create(trust)
+                    completionHandler(useCredential, credential)
+                } else {
+                    completionHandler(performDefault, null)
+                }
+            } else {
+                completionHandler(performDefault, null)
+            }
+        }
+    } else {
+        handleChallenge { _: NSURLSession, _: NSURLSessionTask?, _: NSURLAuthenticationChallenge, completionHandler ->
+            completionHandler(NSURLSessionAuthChallengePerformDefaultHandling.toInt(), null)
+        }
+    }
+
+}
 
 internal actual fun defaultHeaders(): MutableMap<String, String> {
     return mutableMapOf(
