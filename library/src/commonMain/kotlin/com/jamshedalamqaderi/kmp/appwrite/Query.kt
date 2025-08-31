@@ -23,31 +23,31 @@ data class Query<T>(
         fun <T> notEqual(
             attribute: String,
             value: T,
-            nestedType: KSerializer<T>
+            nestedType: KSerializer<T>,
         ) = Query("notEqual", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun <T> lessThan(
             attribute: String,
             value: T,
-            nestedType: KSerializer<T>
+            nestedType: KSerializer<T>,
         ) = Query("lessThan", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun <T> lessThanEqual(
             attribute: String,
             value: T,
-            nestedType: KSerializer<T>
+            nestedType: KSerializer<T>,
         ) = Query("lessThanEqual", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun <T> greaterThan(
             attribute: String,
             value: T,
-            nestedType: KSerializer<T>
+            nestedType: KSerializer<T>,
         ) = Query("greaterThan", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun <T> greaterThanEqual(
             attribute: String,
             value: T,
-            nestedType: KSerializer<T>
+            nestedType: KSerializer<T>,
         ) = Query("greaterThanEqual", attribute, listOf(value)).toJson(serializer(nestedType))
 
         fun search(
@@ -63,7 +63,7 @@ data class Query<T>(
             attribute: String,
             start: T,
             end: T,
-            nestedType: KSerializer<T>
+            nestedType: KSerializer<T>,
         ) = Query("between", attribute, listOf(start, end)).toJson(serializer(nestedType))
 
         fun startsWith(
@@ -95,16 +95,18 @@ data class Query<T>(
             value: String,
         ) = Query("contains", attribute, listOf(value)).toJson()
 
-        fun or(queries: List<String>) = Query(
-            "or",
-            null,
-            queries.map { it.fromJson(serializer(JsonElement.serializer())) }
-        ).toJson()
+        fun or(queries: List<String>) =
+            Query(
+                "or",
+                null,
+                queries.map { it.fromJson(serializer(JsonElement.serializer())) },
+            ).toJson()
 
-        fun and(queries: List<String>) = Query(
-            "and",
-            null,
-            queries.map { it.fromJson(serializer(JsonElement.serializer())) }
-        ).toJson()
+        fun and(queries: List<String>) =
+            Query(
+                "and",
+                null,
+                queries.map { it.fromJson(serializer(JsonElement.serializer())) },
+            ).toJson()
     }
 }

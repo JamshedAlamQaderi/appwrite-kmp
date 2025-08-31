@@ -2,7 +2,7 @@ package com.jamshedalamqaderi.kmp.appwrite.services
 
 import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
-import io.ktor.client.call.*
+import io.ktor.client.call.body
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
 
@@ -21,19 +21,21 @@ class Graphql(client: Client) : Service(client) {
     suspend fun query(query: String): JsonElement {
         val apiPath = "/graphql"
 
-        val apiParams = mapOf(
-            "query" to query
-        )
-        val apiHeaders = mapOf(
-            "x-sdk-graphql" to "true",
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf(
+                "query" to query,
+            )
+        val apiHeaders =
+            mapOf(
+                "x-sdk-graphql" to "true",
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<JsonElement>() }
+            converter = { it.body<JsonElement>() },
         )
     }
 
@@ -48,20 +50,22 @@ class Graphql(client: Client) : Service(client) {
     suspend fun mutation(query: String): JsonElement {
         val apiPath = "/graphql/mutation"
 
-        val apiParams = mapOf(
-            "query" to query
-        )
-        val apiHeaders = mapOf(
-            "x-sdk-graphql" to "true",
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf(
+                "query" to query,
+            )
+        val apiHeaders =
+            mapOf(
+                "x-sdk-graphql" to "true",
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<JsonElement>() }
+            converter = { it.body<JsonElement>() },
         )
     }
 }

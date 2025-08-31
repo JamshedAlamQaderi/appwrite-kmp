@@ -1,7 +1,10 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
+import com.jamshedalamqaderi.kmp.appwrite.extensions.jsonCast
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 /**
  * Team
@@ -37,5 +40,19 @@ data class Team<T>(
      * Team preferences as a key-value object
      */
     @SerialName("prefs")
-    val prefs: Preferences<T>,
+    val prefs: T,
 )
+
+internal fun <T> Team<JsonElement>.asTeamPreferences(deserializer: DeserializationStrategy<T>): Team<Preferences<T>> {
+    return Team(
+        id = id,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        name = name,
+        total = total,
+        prefs =
+            Preferences(
+                data = this.prefs.jsonCast(JsonElement.serializer(), deserializer),
+            ),
+    )
+}

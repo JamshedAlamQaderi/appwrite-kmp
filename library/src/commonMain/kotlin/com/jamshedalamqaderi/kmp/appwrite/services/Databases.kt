@@ -7,8 +7,8 @@ import com.jamshedalamqaderi.kmp.appwrite.extensions.json
 import com.jamshedalamqaderi.kmp.appwrite.models.Document
 import com.jamshedalamqaderi.kmp.appwrite.models.DocumentList
 import com.jamshedalamqaderi.kmp.appwrite.models.asDocument
-import io.ktor.client.call.*
-import io.ktor.http.*
+import io.ktor.client.call.body
+import io.ktor.http.HttpMethod
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlin.coroutines.cancellation.CancellationException
@@ -41,20 +41,23 @@ class Databases(client: Client) : Service(client) {
                 .replace("{databaseId}", databaseId)
                 .replace("{collectionId}", collectionId)
 
-        val apiParams = mapOf<String, Any>(
-            "queries" to (queries ?: emptyList())
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "queries" to (queries ?: emptyList()),
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val documents = client.call(
-            HttpMethod.Get,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<DocumentList<JsonElement>>() }
-        )
+        val documents =
+            client.call(
+                HttpMethod.Get,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<DocumentList<JsonElement>>() },
+            )
         return DocumentList(
             total = documents.total,
             documents = documents.documents.map { it.asDocument(nestedType) },
@@ -111,22 +114,25 @@ class Databases(client: Client) : Service(client) {
                 .replace("{databaseId}", databaseId)
                 .replace("{collectionId}", collectionId)
 
-        val apiParams = mapOf(
-            "documentId" to documentId,
-            "data" to json.encodeToString(nestedType, data),
-            "permissions" to (permissions ?: emptyList<String>())
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf(
+                "documentId" to documentId,
+                "data" to json.encodeToString(nestedType, data),
+                "permissions" to (permissions ?: emptyList()),
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val response = client.call(
-            HttpMethod.Post,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() }
-        )
+        val response =
+            client.call(
+                HttpMethod.Post,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            )
         return response.asDocument(nestedType)
     }
 
@@ -150,14 +156,15 @@ class Databases(client: Client) : Service(client) {
         documentId: String,
         data: JsonElement,
         permissions: List<String>? = null,
-    ): Document<JsonElement> = createDocument(
-        databaseId,
-        collectionId,
-        documentId,
-        data,
-        permissions,
-        nestedType = JsonElement.serializer(),
-    )
+    ): Document<JsonElement> =
+        createDocument(
+            databaseId,
+            collectionId,
+            documentId,
+            data,
+            permissions,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Get document
@@ -184,20 +191,23 @@ class Databases(client: Client) : Service(client) {
                 .replace("{collectionId}", collectionId)
                 .replace("{documentId}", documentId)
 
-        val apiParams = mapOf<String, Any>(
-            "queries" to (queries ?: emptyList())
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "queries" to (queries ?: emptyList()),
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val response = client.call(
-            HttpMethod.Get,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() }
-        )
+        val response =
+            client.call(
+                HttpMethod.Get,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            )
         return response.asDocument(nestedType)
     }
 
@@ -219,13 +229,14 @@ class Databases(client: Client) : Service(client) {
         collectionId: String,
         documentId: String,
         queries: List<String>? = null,
-    ): Document<JsonElement> = getDocument(
-        databaseId,
-        collectionId,
-        documentId,
-        queries,
-        nestedType = JsonElement.serializer(),
-    )
+    ): Document<JsonElement> =
+        getDocument(
+            databaseId,
+            collectionId,
+            documentId,
+            queries,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Update document
@@ -254,21 +265,24 @@ class Databases(client: Client) : Service(client) {
                 .replace("{collectionId}", collectionId)
                 .replace("{documentId}", documentId)
 
-        val apiParams = mapOf(
-            "data" to json.encodeToString(nestedType, data),
-            "permissions" to (permissions ?: emptyList())
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf(
+                "data" to json.encodeToString(nestedType, data),
+                "permissions" to (permissions ?: emptyList()),
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val response = client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() }
-        )
+        val response =
+            client.call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            )
         return response.asDocument(nestedType)
     }
 
@@ -292,14 +306,15 @@ class Databases(client: Client) : Service(client) {
         documentId: String,
         data: JsonElement,
         permissions: List<String>? = null,
-    ): Document<JsonElement> = updateDocument(
-        databaseId,
-        collectionId,
-        documentId,
-        data,
-        permissions,
-        nestedType = JsonElement.serializer(),
-    )
+    ): Document<JsonElement> =
+        updateDocument(
+            databaseId,
+            collectionId,
+            documentId,
+            data,
+            permissions,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Delete document
@@ -322,15 +337,186 @@ class Databases(client: Client) : Service(client) {
                 .replace("{collectionId}", collectionId)
                 .replace("{documentId}", documentId)
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Delete,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { }
+            converter = { },
         )
     }
+
+    /**
+     * Decrement a specific attribute of a document by a given value.
+     *
+     * @param databaseId Database ID.
+     * @param collectionId Collection ID.
+     * @param documentId Document ID.
+     * @param attribute Attribute key.
+     * @param value Value to increment the attribute by. The value must be a number.
+     * @param min Minimum value for the attribute. If the current value is lesser than this value, an exception will be thrown.
+     * @return [io.appwrite.models.Document<T>]
+     */
+    @Deprecated(
+        message = "This API has been deprecated since 1.8.0. Please use `TablesDB.decrementRowColumn` instead.",
+        replaceWith = ReplaceWith("io.appwrite.services.TablesDB.decrementRowColumn"),
+    )
+    @JvmOverloads
+    suspend fun <T> decrementDocumentAttribute(
+        databaseId: String,
+        collectionId: String,
+        documentId: String,
+        attribute: String,
+        value: Double? = null,
+        min: Double? = null,
+        nestedType: KSerializer<T>,
+    ): Document<T> {
+        val apiPath =
+            "/databases/{databaseId}/collections/{collectionId}/documents/{documentId}/{attribute}/decrement"
+                .replace("{databaseId}", databaseId)
+                .replace("{collectionId}", collectionId)
+                .replace("{documentId}", documentId)
+                .replace("{attribute}", attribute)
+
+        val apiParams =
+            mapOf<String, Any?>(
+                "value" to value,
+                "min" to min,
+            )
+        val apiHeaders =
+            mutableMapOf(
+                "content-type" to "application/json",
+            )
+        return client.call(
+            HttpMethod.Patch,
+            apiPath,
+            apiHeaders,
+            apiParams,
+            converter = { it.body<JsonElement>() },
+        ).asDocument(nestedType)
+    }
+
+    /**
+     * Decrement a specific attribute of a document by a given value.
+     *
+     * @param databaseId Database ID.
+     * @param collectionId Collection ID.
+     * @param documentId Document ID.
+     * @param attribute Attribute key.
+     * @param value Value to increment the attribute by. The value must be a number.
+     * @param min Minimum value for the attribute. If the current value is lesser than this value, an exception will be thrown.
+     * @return [io.appwrite.models.Document<T>]
+     */
+    @Deprecated(
+        message = "This API has been deprecated since 1.8.0. Please use `TablesDB.decrementRowColumn` instead.",
+        replaceWith = ReplaceWith("io.appwrite.services.TablesDB.decrementRowColumn"),
+    )
+    @JvmOverloads
+    @Throws(AppwriteException::class)
+    suspend fun decrementDocumentAttribute(
+        databaseId: String,
+        collectionId: String,
+        documentId: String,
+        attribute: String,
+        value: Double? = null,
+        min: Double? = null,
+    ): Document<JsonElement> =
+        decrementDocumentAttribute(
+            databaseId,
+            collectionId,
+            documentId,
+            attribute,
+            value,
+            min,
+            nestedType = JsonElement.serializer(),
+        )
+
+    /**
+     * Increment a specific attribute of a document by a given value.
+     *
+     * @param databaseId Database ID.
+     * @param collectionId Collection ID.
+     * @param documentId Document ID.
+     * @param attribute Attribute key.
+     * @param value Value to increment the attribute by. The value must be a number.
+     * @param max Maximum value for the attribute. If the current value is greater than this value, an error will be thrown.
+     * @return [io.appwrite.models.Document<T>]
+     */
+    @Deprecated(
+        message = "This API has been deprecated since 1.8.0. Please use `TablesDB.incrementRowColumn` instead.",
+        replaceWith = ReplaceWith("io.appwrite.services.TablesDB.incrementRowColumn"),
+    )
+    @JvmOverloads
+    suspend fun <T> incrementDocumentAttribute(
+        databaseId: String,
+        collectionId: String,
+        documentId: String,
+        attribute: String,
+        value: Double? = null,
+        max: Double? = null,
+        nestedType: KSerializer<T>,
+    ): Document<T> {
+        val apiPath =
+            "/databases/{databaseId}/collections/{collectionId}/documents/{documentId}/{attribute}/increment"
+                .replace("{databaseId}", databaseId)
+                .replace("{collectionId}", collectionId)
+                .replace("{documentId}", documentId)
+                .replace("{attribute}", attribute)
+
+        val apiParams =
+            mapOf<String, Any?>(
+                "value" to value,
+                "max" to max,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
+        return client.call(
+            HttpMethod.Patch,
+            apiPath,
+            apiHeaders,
+            apiParams,
+            converter = { it.body<JsonElement>() },
+        ).asDocument(nestedType)
+    }
+
+    /**
+     * Increment a specific attribute of a document by a given value.
+     *
+     * @param databaseId Database ID.
+     * @param collectionId Collection ID.
+     * @param documentId Document ID.
+     * @param attribute Attribute key.
+     * @param value Value to increment the attribute by. The value must be a number.
+     * @param max Maximum value for the attribute. If the current value is greater than this value, an error will be thrown.
+     * @return [io.appwrite.models.Document<T>]
+     */
+    @Deprecated(
+        message = "This API has been deprecated since 1.8.0. Please use `TablesDB.incrementRowColumn` instead.",
+        replaceWith = ReplaceWith("io.appwrite.services.TablesDB.incrementRowColumn"),
+    )
+    @JvmOverloads
+    @Throws(AppwriteException::class)
+    suspend fun incrementDocumentAttribute(
+        databaseId: String,
+        collectionId: String,
+        documentId: String,
+        attribute: String,
+        value: Double? = null,
+        max: Double? = null,
+    ): Document<JsonElement> =
+        incrementDocumentAttribute(
+            databaseId,
+            collectionId,
+            documentId,
+            attribute,
+            value,
+            max,
+            nestedType = JsonElement.serializer(),
+        )
 }

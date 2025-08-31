@@ -1,11 +1,10 @@
 package com.jamshedalamqaderi.kmp.appwrite
 
-import io.ktor.client.engine.*
-import io.ktor.client.engine.darwin.*
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.darwin.Darwin
 import platform.Foundation.NSBundle
 import platform.Foundation.NSProcessInfo
 import platform.UIKit.UIDevice
-
 
 internal actual fun httpEngine(): HttpClientEngine = Darwin.create()
 

@@ -2,8 +2,8 @@ package com.jamshedalamqaderi.kmp.appwrite.services
 
 import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
-import io.ktor.client.call.*
 import com.jamshedalamqaderi.kmp.appwrite.models.Subscriber
+import io.ktor.client.call.body
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
 
@@ -19,7 +19,7 @@ class Messaging(client: Client) : Service(client) {
      * @param topicId Topic ID. The topic ID to subscribe to.
      * @param subscriberId Subscriber ID. Choose a custom Subscriber ID or a new Subscriber ID.
      * @param targetId Target ID. The target ID to link to the specified Topic ID.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Subscriber]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Subscriber]
      */
     suspend fun createSubscriber(
         topicId: String,
@@ -30,20 +30,22 @@ class Messaging(client: Client) : Service(client) {
             "/messaging/topics/{topicId}/subscribers"
                 .replace("{topicId}", topicId)
 
-        val apiParams = mapOf(
-            "subscriberId" to subscriberId,
-            "targetId" to targetId,
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf(
+                "subscriberId" to subscriberId,
+                "targetId" to targetId,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Subscriber>() }
+            converter = { it.body<Subscriber>() },
         )
     }
 
@@ -65,15 +67,16 @@ class Messaging(client: Client) : Service(client) {
                 .replace("{topicId}", topicId)
                 .replace("{subscriberId}", subscriberId)
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Delete,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<JsonElement>() }
+            converter = { it.body<JsonElement>() },
         )
     }
 }

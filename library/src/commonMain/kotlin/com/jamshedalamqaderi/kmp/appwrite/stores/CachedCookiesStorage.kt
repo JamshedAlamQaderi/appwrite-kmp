@@ -6,9 +6,10 @@ import com.jamshedalamqaderi.kmp.appwrite.extensions.matches
 import com.jamshedalamqaderi.kmp.appwrite.extensions.toJson
 import com.jamshedalamqaderi.kmp.appwrite.models.CookieCache
 import com.russhwolf.settings.Settings
-import io.ktor.client.plugins.cookies.*
-import io.ktor.http.*
-import io.ktor.util.date.*
+import io.ktor.client.plugins.cookies.CookiesStorage
+import io.ktor.http.Cookie
+import io.ktor.http.Url
+import io.ktor.util.date.getTimeMillis
 import kotlinx.atomicfu.AtomicLong
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.sync.Mutex
@@ -38,7 +39,7 @@ class CachedCookiesStorage : CookiesStorage {
             val container = readAllCookies().toMutableList()
             container.removeAll { (existingCookie, _) ->
                 existingCookie.name == cookie.name &&
-                        existingCookie.toHttpCookie().matches(requestUrl)
+                    existingCookie.toHttpCookie().matches(requestUrl)
             }
             val createdAt = getTimeMillis()
             container.add(

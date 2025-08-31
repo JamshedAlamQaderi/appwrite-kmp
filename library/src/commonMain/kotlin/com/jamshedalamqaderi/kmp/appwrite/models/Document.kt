@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
+
 /**
  * Document
  */
@@ -51,16 +52,18 @@ data class Document<T>(
     @SerialName("data")
     val data: T,
 )
+
 @Deprecated("Use TableDB instead.", replaceWith = ReplaceWith("asRow"))
 internal fun <T> JsonElement.asDocument(deserializer: DeserializationStrategy<T>): Document<T> {
-    val keys = listOf(
-        "\$id",
-        "\$collectionId",
-        "\$databaseId",
-        "\$createdAt",
-        "\$updatedAt",
-        "\$permissions",
-    )
+    val keys =
+        listOf(
+            "\$id",
+            "\$collectionId",
+            "\$databaseId",
+            "\$createdAt",
+            "\$updatedAt",
+            "\$permissions",
+        )
     val dataObject =
         buildJsonObject {
             jsonObject.entries.forEach {

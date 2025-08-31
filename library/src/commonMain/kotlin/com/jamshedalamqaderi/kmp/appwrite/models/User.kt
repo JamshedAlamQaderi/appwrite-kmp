@@ -127,6 +127,6 @@ internal fun <T> User<JsonElement>.asPreferencesUser(deserializer: Deserializati
         mfa = mfa,
         prefs = this.prefs.asPreferences(deserializer),
         targets = targets,
-        accessedAt = accessedAt
+        accessedAt = accessedAt,
     )
 }

@@ -18,7 +18,6 @@ data class Preferences<T>(
     val data: T? = null,
 )
 
-
 fun <T> JsonElement.asPreferences(deserializer: DeserializationStrategy<T>): Preferences<T> {
     return Preferences(
         data = this.jsonCast(JsonElement.serializer(), deserializer),

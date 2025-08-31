@@ -1,7 +1,9 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
+
+internal typealias RealtimeCallbackFunction<T> = suspend (RealtimeResponseEvent<T>) -> Unit
 
 data class RealtimeSubscription(
     private val close: () -> Unit,
@@ -10,22 +12,21 @@ data class RealtimeSubscription(
 }
 
 @Serializable
-data class RealtimeCallback<T>(
-    val channels: Collection<String>,
-    val payloadClass: KSerializer<T>,
-    val callback: (RealtimeResponseEvent<T>) -> Unit,
+data class RealtimeCallback(
+    val channels: Set<String>,
+    val callback: RealtimeCallbackFunction<JsonElement>,
 )
 
 @Serializable
 open class RealtimeResponse<T>(
     val type: String,
-    val data: T,
+    val data: T? = null,
 )
 
 @Serializable
 data class RealtimeResponseEvent<T>(
-    val events: Collection<String>,
-    val channels: Collection<String>,
+    val events: List<String>,
+    val channels: List<String>,
     val timestamp: String,
     var payload: T,
 )

@@ -16,18 +16,19 @@ suspend fun <T> Collection<T>.forEachAsync(callback: suspend (T) -> Unit) =
 
 @Suppress("UNCHECKED_CAST")
 internal fun Any.encodeUnknownValue(): JsonElement {
-    val elementSerializer: KSerializer<Any?> = when (this) {
-        is String -> String.serializer()
-        is Int -> Int.serializer()
-        is Long -> Long.serializer()
-        is Boolean -> Boolean.serializer()
-        is Double -> Double.serializer()
-        is Float -> Float.serializer()
-        is JsonElement -> JsonElement.serializer()
-        is KSerializer<*> -> error("You passed a list of KSerializer objects, not data!")
-        else -> throw SerializationException(
-            "Don’t know how to serialise elements of type ${this::class.qualifiedName}"
-        )
-    } as KSerializer<Any?>
+    val elementSerializer: KSerializer<Any?> =
+        when (this) {
+            is String -> String.serializer()
+            is Int -> Int.serializer()
+            is Long -> Long.serializer()
+            is Boolean -> Boolean.serializer()
+            is Double -> Double.serializer()
+            is Float -> Float.serializer()
+            is JsonElement -> JsonElement.serializer()
+            is KSerializer<*> -> error("You passed a list of KSerializer objects, not data!")
+            else -> throw SerializationException(
+                "Don’t know how to serialise elements of type ${this::class.qualifiedName}",
+            )
+        } as KSerializer<Any?>
     return json.encodeToJsonElement(elementSerializer, this)
 }
