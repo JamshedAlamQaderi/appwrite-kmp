@@ -30,6 +30,9 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -41,9 +44,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Duration.Companion.seconds
 
 class Client(
     var endpoint: String = "https://cloud.appwrite.io/v1",
@@ -199,6 +199,23 @@ class Client(
         headers[key] = value
         updated = true
         return this
+    }
+
+    /**
+     * Sends a "ping" request to Appwrite to verify connectivity.
+     *
+     * @return String
+     */
+    suspend fun ping(): String {
+        val apiPath = "/ping"
+        val apiHeaders = mutableMapOf("content-type" to "application/json")
+
+        return call(
+            HttpMethod.Get,
+            apiPath,
+            apiHeaders,
+            converter = { it.bodyAsText() }
+        )
     }
 
     /**
