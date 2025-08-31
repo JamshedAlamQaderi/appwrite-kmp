@@ -2,7 +2,7 @@ package com.jamshedalamqaderi.kmp.appwrite.services
 
 import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
-import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
+import io.ktor.client.call.*
 import com.jamshedalamqaderi.kmp.appwrite.models.Subscriber
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
@@ -30,22 +30,20 @@ class Messaging(client: Client) : Service(client) {
             "/messaging/topics/{topicId}/subscribers"
                 .replace("{topicId}", topicId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("subscriberId", subscriberId),
-                ClientParam.StringParam("targetId", targetId),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf(
+            "subscriberId" to subscriberId,
+            "targetId" to targetId,
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
-            Subscriber.serializer(),
             apiHeaders,
             apiParams,
+            converter = { it.body<Subscriber>() }
         )
     }
 
@@ -67,15 +65,15 @@ class Messaging(client: Client) : Service(client) {
                 .replace("{topicId}", topicId)
                 .replace("{subscriberId}", subscriberId)
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Delete,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<JsonElement>() }
         )
     }
 }

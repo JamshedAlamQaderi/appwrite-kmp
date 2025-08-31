@@ -1,14 +1,14 @@
 package com.jamshedalamqaderi.kmp.appwrite
 
 import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
-import com.jamshedalamqaderi.kmp.appwrite.extensions.fromJson
-import com.jamshedalamqaderi.kmp.appwrite.extensions.json
-import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
+import com.jamshedalamqaderi.kmp.appwrite.extensions.encodeUnknownValue
 import com.jamshedalamqaderi.kmp.appwrite.models.Progress
 import com.jamshedalamqaderi.kmp.appwrite.stores.CachedCookiesStorage
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.websocket.*
@@ -16,17 +16,18 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.io.buffered
+import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.builtins.ByteArraySerializer
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.putJsonObject
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
@@ -200,143 +201,154 @@ class Client(
     @Suppress("UNCHECKED_CAST")
     @OptIn(ExperimentalSerializationApi::class)
     @Throws(AppwriteException::class, CancellationException::class)
-    suspend fun <T> call(
+    internal suspend fun <T> call(
         method: HttpMethod,
         path: String,
-        deserializer: DeserializationStrategy<T>,
         headers: Map<String, String> = mapOf(),
-        params: List<ClientParam> = emptyList(),
+        params: Map<String, Any> = emptyMap(),
         onUpload: ((Progress) -> Unit)? = null,
         onDownload: ((Progress) -> Unit)? = null,
+        converter: (suspend (HttpResponse) -> T)? = null,
     ): T {
         createOrGetClient()
-        val response =
-            http.request(path.replaceFirst("/", "")) {
-                if (onUpload != null) {
-                    onUpload { sent, total ->
-                        onUpload(Progress(total ?: 0L, sent))
+        return http.prepareRequest(path.replaceFirst("/", "")) {
+            if (onUpload != null) {
+                onUpload { sent, total ->
+                    onUpload(Progress(total ?: 0L, sent))
+                }
+            }
+            if (onDownload != null) {
+                onDownload { received, total ->
+                    onDownload(Progress(total ?: 0, received))
+                }
+            }
+            this.method = method
+            headers.forEach {
+                this.headers.append(it.key, it.value)
+            }
+            when (method) {
+                HttpMethod.Get -> {
+                    prepareGetParams(params)
+                }
+
+                else -> {
+                    if (headers["content-type"] == ContentType.MultiPart.FormData.toString()) {
+                        prepareMultiDataFormParams(params)
+                    } else {
+                        preparePostParams(params)
                     }
                 }
-                if (onDownload != null) {
-                    onDownload { received, total ->
-                        onDownload(Progress(total ?: 0, received))
+            }
+        }.execute { response ->
+            if (response.status.value in 200..299) {
+                converter?.invoke(response) ?: throw AppwriteException(message = "Response converter is null")
+            } else {
+                try {
+                    throw response.body<AppwriteException>()
+                } catch (_: Exception) {
+                    throw AppwriteException(
+                        message = response.bodyAsText(),
+                        code = response.status.value,
+                        type = response.status.description
+                    )
+                }
+            }
+        }
+    }
+
+
+    private fun HttpRequestBuilder.prepareGetParams(params: Map<String, Any>) {
+        for ((key, value) in params) {
+            when (value) {
+                is List<*> -> {
+                    for (item in value) {
+                        parameter("$key[]", item.toString())
                     }
                 }
-                this.method = method
-                headers.forEach {
-                    this.headers.append(it.key, it.value)
+
+                else -> {
+                    parameter(key, value.toString())
                 }
-                when (method) {
-                    HttpMethod.Get -> {
-                        params.forEach { param ->
-                            when (param) {
-                                is ClientParam.FileParam -> {}
-                                is ClientParam.ListParam -> {
-                                    param.value.forEach { paramValue ->
-                                        parameter("${param.key}[]", paramValue)
-                                    }
-                                }
+            }
+        }
+    }
 
-                                is ClientParam.StringParam -> {
-                                    parameter(param.key, param.value)
-                                }
+    private fun HttpRequestBuilder.prepareMultiDataFormParams(params: Map<String, Any>) {
+        val formData = formData {
+            for ((key, value) in params) {
+                when (value) {
+                    is List<*> -> {
+                        for (item in value) {
+                            append("$key[]", item.toString())
+                        }
+                    }
 
-                                is ClientParam.MapParam -> {}
+                    is Path -> {
+                        append(
+                            "file",
+                            InputProvider(
+                                SystemFileSystem.metadataOrNull(value)?.size,
+                            ) {
+                                SystemFileSystem.source(value)
+                                    .buffered()
+                            },
+                            Headers.build {
+                                append(
+                                    HttpHeaders.ContentType,
+                                    ContentType.Application.OctetStream.toString(),
+                                )
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "filename=${value.name}",
+                                )
+                            },
+                        )
+                    }
+
+                    else -> {
+                        append(key, value.toString())
+                    }
+                }
+            }
+        }
+        setBody(MultiPartFormDataContent(formData))
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private fun HttpRequestBuilder.preparePostParams(params: Map<String, Any>) {
+        val bodyMap = buildJsonObject {
+            for ((key, value) in params) {
+                when (value) {
+                    is List<*> -> {
+                        putJsonArray(key) {
+                            addAll(value.mapNotNull { it?.encodeUnknownValue() })
+                        }
+                    }
+
+                    is Map<*, *> -> {
+                        putJsonObject(key) {
+                            value.forEach { (k, v) ->
+                                v?.encodeUnknownValue()?.let { put(k.toString(), it) }
                             }
                         }
                     }
 
                     else -> {
-                        if (headers["content-type"] == ContentType.MultiPart.FormData.toString()) {
-                            val formDataContent =
-                                formData {
-                                    params.forEach { param ->
-                                        when (param) {
-                                            is ClientParam.FileParam -> {
-                                                append(
-                                                    "file",
-                                                    InputProvider(
-                                                        SystemFileSystem.metadataOrNull(param.path)?.size,
-                                                    ) {
-                                                        SystemFileSystem.source(param.path)
-                                                            .buffered()
-                                                    },
-                                                    Headers.build {
-                                                        append(
-                                                            HttpHeaders.ContentType,
-                                                            ContentType.Application.OctetStream.toString(),
-                                                        )
-                                                        append(
-                                                            HttpHeaders.ContentDisposition,
-                                                            "filename=${param.path.name}",
-                                                        )
-                                                    },
-                                                )
-                                            }
-
-                                            is ClientParam.ListParam -> {
-                                                param.value.forEach { paramValue ->
-                                                    append("${param.key}[]", paramValue)
-                                                }
-                                            }
-
-                                            is ClientParam.StringParam -> {
-                                                append(param.key, param.value.toString())
-                                            }
-
-                                            is ClientParam.MapParam -> {}
-                                        }
-                                    }
-                                }
-                            setBody(MultiPartFormDataContent(formDataContent))
-                        } else {
-                            val bodyMap =
-                                buildJsonObject {
-                                    params.forEach { param ->
-                                        when (param) {
-                                            is ClientParam.FileParam -> {}
-                                            is ClientParam.ListParam -> {
-                                                putJsonArray(param.key) {
-                                                    addAll(param.value)
-                                                }
-                                            }
-
-                                            is ClientParam.StringParam -> {
-                                                put(param.key, param.value)
-                                            }
-
-                                            is ClientParam.MapParam -> {
-                                                putJsonObject(param.key) {
-                                                    param.value.forEach { entry ->
-                                                        put(entry.key, entry.value)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            setBody(json.encodeToString(bodyMap))
-                        }
+                        put(key, value.encodeUnknownValue())
                     }
                 }
             }
-        return try {
-            if (deserializer == Unit.serializer()) {
-                Unit as T
-            } else if (deserializer == ByteArraySerializer()) {
-                response.bodyAsBytes() as T
-            } else {
-                response.bodyAsText().fromJson(deserializer)
-            }
-        } catch (_: Exception) {
-            throw response.bodyAsText().fromJson<AppwriteException>()
         }
+        setBody(bodyMap)
     }
 
     internal fun createOrGetClient(): HttpClient {
         if (!updated) return http
         http =
             HttpClient(httpEngine()) {
+                install(ContentNegotiation) {
+                    json(Json { ignoreUnknownKeys = true })
+                }
                 install(HttpCookies) {
                     storage = CachedCookiesStorage()
                 }

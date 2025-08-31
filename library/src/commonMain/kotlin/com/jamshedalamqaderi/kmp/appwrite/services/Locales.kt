@@ -10,6 +10,7 @@ import com.jamshedalamqaderi.kmp.appwrite.models.Locale
 import com.jamshedalamqaderi.kmp.appwrite.models.LocaleCodeList
 import com.jamshedalamqaderi.kmp.appwrite.models.PhoneList
 import io.ktor.http.HttpMethod
+import io.ktor.client.call.*
 
 /**
  * The Locale service allows you to customize your app based on your users&#039; location.
@@ -25,15 +26,15 @@ class Locales(client: Client) : Service(client) {
     suspend fun get(): Locale {
         val apiPath = "/locale"
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Get,
             apiPath,
-            Locale.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<Locale>() }
         )
     }
 
@@ -47,15 +48,15 @@ class Locales(client: Client) : Service(client) {
     suspend fun listCodes(): LocaleCodeList {
         val apiPath = "/locale/codes"
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Get,
             apiPath,
-            LocaleCodeList.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<LocaleCodeList>() }
         )
     }
 
@@ -69,15 +70,15 @@ class Locales(client: Client) : Service(client) {
     suspend fun listContinents(): ContinentList {
         val apiPath = "/locale/continents"
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Get,
             apiPath,
-            ContinentList.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<ContinentList>() }
         )
     }
 
@@ -91,15 +92,15 @@ class Locales(client: Client) : Service(client) {
     suspend fun listCountries(): CountryList {
         val apiPath = "/locale/countries"
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
         return client.call(
             HttpMethod.Get,
             apiPath,
-            CountryList.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<CountryList>() }
         )
     }
 
@@ -113,16 +114,16 @@ class Locales(client: Client) : Service(client) {
     suspend fun listCountriesEU(): CountryList {
         val apiPath = "/locale/countries/eu"
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
-            CountryList.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<CountryList>() }
         )
     }
 
@@ -136,16 +137,16 @@ class Locales(client: Client) : Service(client) {
     suspend fun listCountriesPhones(): PhoneList {
         val apiPath = "/locale/countries/phones"
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
-            PhoneList.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<PhoneList>() }
         )
     }
 
@@ -159,16 +160,16 @@ class Locales(client: Client) : Service(client) {
     suspend fun listCurrencies(): CurrencyList {
         val apiPath = "/locale/currencies"
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
-            CurrencyList.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<CurrencyList>() }
         )
     }
 
@@ -182,16 +183,16 @@ class Locales(client: Client) : Service(client) {
     suspend fun listLanguages(): LanguageList {
         val apiPath = "/locale/languages"
 
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
-            LanguageList.serializer(),
             apiHeaders,
+            emptyMap(),
+            converter = { it.body<LanguageList>() }
         )
     }
 }

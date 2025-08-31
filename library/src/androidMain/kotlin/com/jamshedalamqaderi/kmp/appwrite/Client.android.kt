@@ -2,8 +2,8 @@ package com.jamshedalamqaderi.kmp.appwrite
 
 import android.content.Context
 import android.content.pm.PackageManager
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.engine.*
+import io.ktor.client.engine.okhttp.*
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
@@ -34,8 +34,8 @@ internal actual fun defaultHeaders(): MutableMap<String, String> {
         "x-sdk-name" to "Android",
         "x-sdk-platform" to "client",
         "x-sdk-language" to "android",
-        "x-sdk-version" to "5.1.1",
-        "x-appwrite-response-format" to "1.5.7",
+        "x-sdk-version" to "9.0.0",
+        "x-appwrite-response-format" to "1.8.0",
     )
 }
 

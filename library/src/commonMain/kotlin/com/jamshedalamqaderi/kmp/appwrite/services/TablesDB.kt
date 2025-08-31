@@ -4,7 +4,7 @@ import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
 import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
 import com.jamshedalamqaderi.kmp.appwrite.extensions.json
-import com.jamshedalamqaderi.kmp.appwrite.models.ClientParam
+import io.ktor.client.call.*
 import com.jamshedalamqaderi.kmp.appwrite.models.Row
 import com.jamshedalamqaderi.kmp.appwrite.models.RowList
 import com.jamshedalamqaderi.kmp.appwrite.models.asRow
@@ -13,6 +13,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
 import kotlin.jvm.JvmOverloads
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  *
@@ -37,22 +38,19 @@ class TablesDB(client: Client) : Service(client) {
             .replace("{databaseId}", databaseId)
             .replace("{tableId}", tableId)
 
-        val apiParams =
-            listOf(
-                ClientParam.ListParam("queries", queries ?: emptyList()),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf<String, Any>(
+            "queries" to (queries ?: emptyList())
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
-        val rows =
-            client.call(
-                HttpMethod.Get,
-                apiPath,
-                RowList.serializer(JsonElement.serializer()),
-                apiHeaders,
-                apiParams,
+        val rows = client.call(
+            HttpMethod.Get,
+            apiPath,
+            apiHeaders,
+            apiParams,
+            converter = { it.body<RowList<JsonElement>>() }
         )
         return RowList(
             total = rows.total,
@@ -69,7 +67,7 @@ class TablesDB(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.RowList<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun listRows(
         databaseId: String,
         tableId: String,
@@ -105,24 +103,23 @@ class TablesDB(client: Client) : Service(client) {
             .replace("{databaseId}", databaseId)
             .replace("{tableId}", tableId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("rowId", rowId),
-                ClientParam.StringParam("data", json.encodeToString(nestedType, data)),
-                ClientParam.ListParam("permissions", permissions ?: emptyList()),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf(
+            "rowId" to rowId,
+            "data" to json.encodeToString(nestedType, data),
+            "permissions" to (permissions ?: emptyList<String>())
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
-        return client.call(
+        val response = client.call(
             HttpMethod.Post,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
             apiParams,
-        ).asRow(nestedType)
+            converter = { it.body<JsonElement>() }
+        )
+        return response.asRow(nestedType)
     }
 
     /**
@@ -136,7 +133,7 @@ class TablesDB(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.Row<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun createRow(
         databaseId: String,
         tableId: String,
@@ -175,22 +172,21 @@ class TablesDB(client: Client) : Service(client) {
             .replace("{tableId}", tableId)
             .replace("{rowId}", rowId)
 
-        val apiParams =
-            listOf(
-                ClientParam.ListParam("queries", queries ?: emptyList()),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf<String, Any>(
+            "queries" to (queries ?: emptyList())
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
-        return client.call(
+        val response = client.call(
             HttpMethod.Get,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
             apiParams,
-        ).asRow(nestedType)
+            converter = { it.body<JsonElement>() }
+        )
+        return response.asRow(nestedType)
     }
 
     /**
@@ -203,7 +199,7 @@ class TablesDB(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.Row<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun getRow(
         databaseId: String,
         tableId: String,
@@ -242,22 +238,22 @@ class TablesDB(client: Client) : Service(client) {
             .replace("{tableId}", tableId)
             .replace("{rowId}", rowId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("data", json.encodeToString(nestedType, data)),
-                ClientParam.ListParam("permissions", permissions ?: emptyList()),
-            )
-        val apiHeaders = mutableMapOf(
+        val apiParams = mapOf(
+            "data" to json.encodeToString(nestedType, data),
+            "permissions" to (permissions ?: emptyList<String>())
+        )
+        val apiHeaders = mapOf(
             "content-type" to "application/json",
         )
 
-        return client.call(
+        val response = client.call(
             HttpMethod.Put,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
-            apiParams
-        ).asRow(nestedType)
+            apiParams,
+            converter = { it.body<JsonElement>() }
+        )
+        return response.asRow(nestedType)
     }
 
     /**
@@ -271,7 +267,7 @@ class TablesDB(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.Row<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun upsertRow(
         databaseId: String,
         tableId: String,
@@ -311,23 +307,22 @@ class TablesDB(client: Client) : Service(client) {
             .replace("{tableId}", tableId)
             .replace("{rowId}", rowId)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("data", json.encodeToString(nestedType, data)),
-                ClientParam.ListParam("permissions", permissions ?: emptyList()),
-            )
-        val apiHeaders =
-            mutableMapOf(
-                "content-type" to "application/json",
-            )
+        val apiParams = mapOf(
+            "data" to json.encodeToString(nestedType, data),
+            "permissions" to (permissions ?: emptyList<String>())
+        )
+        val apiHeaders = mapOf(
+            "content-type" to "application/json",
+        )
 
-        return client.call(
+        val response = client.call(
             HttpMethod.Patch,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
             apiParams,
-        ).asRow(nestedType)
+            converter = { it.body<JsonElement>() }
+        )
+        return response.asRow(nestedType)
     }
 
     /**
@@ -341,7 +336,7 @@ class TablesDB(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.Row<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateRow(
         databaseId: String,
         tableId: String,
@@ -376,15 +371,15 @@ class TablesDB(client: Client) : Service(client) {
             .replace("{tableId}", tableId)
             .replace("{rowId}", rowId)
 
-        val apiHeaders = mutableMapOf(
+        val apiHeaders = mapOf(
             "content-type" to "application/json",
         )
         return client.call(
             HttpMethod.Delete,
             apiPath,
-            Unit.serializer(),
             apiHeaders,
-            emptyList(),
+            emptyMap(),
+            converter = { }
         )
     }
 
@@ -416,21 +411,21 @@ class TablesDB(client: Client) : Service(client) {
             .replace("{rowId}", rowId)
             .replace("{column}", column)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("value", value.toString()),
-                ClientParam.StringParam("min", min.toString()),
-            )
-        val apiHeaders = mutableMapOf(
+        val apiParams = buildMap<String, Any> {
+            if (value != null) put("value", value)
+            if (min != null) put("min", min)
+        }
+        val apiHeaders = mapOf(
             "content-type" to "application/json",
         )
-        return client.call(
+        val response = client.call(
             HttpMethod.Patch,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
-            apiParams
-        ).asRow(nestedType)
+            apiParams,
+            converter = { it.body<JsonElement>() }
+        )
+        return response.asRow(nestedType)
     }
 
     /**
@@ -445,7 +440,7 @@ class TablesDB(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.Row<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun decrementRowColumn(
         databaseId: String,
         tableId: String,
@@ -490,22 +485,22 @@ class TablesDB(client: Client) : Service(client) {
             .replace("{rowId}", rowId)
             .replace("{column}", column)
 
-        val apiParams =
-            listOf(
-                ClientParam.StringParam("value", value.toString()),
-                ClientParam.StringParam("max", max.toString()),
-            )
-        val apiHeaders = mutableMapOf(
+        val apiParams = buildMap<String, Any> {
+            if (value != null) put("value", value)
+            if (max != null) put("max", max)
+        }
+        val apiHeaders = mapOf(
             "content-type" to "application/json",
         )
 
-        return client.call(
+        val response = client.call(
             HttpMethod.Patch,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
             apiParams,
-        ).asRow(nestedType)
+            converter = { it.body<JsonElement>() }
+        )
+        return response.asRow(nestedType)
     }
 
     /**
@@ -520,7 +515,7 @@ class TablesDB(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.Row<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun incrementRowColumn(
         databaseId: String,
         tableId: String,
