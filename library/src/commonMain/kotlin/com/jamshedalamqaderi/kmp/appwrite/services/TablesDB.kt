@@ -4,16 +4,15 @@ import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
 import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
 import com.jamshedalamqaderi.kmp.appwrite.extensions.json
-import io.ktor.client.call.*
 import com.jamshedalamqaderi.kmp.appwrite.models.Row
 import com.jamshedalamqaderi.kmp.appwrite.models.RowList
 import com.jamshedalamqaderi.kmp.appwrite.models.asRow
-import io.ktor.http.*
+import io.ktor.client.call.body
+import io.ktor.http.HttpMethod
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
-import kotlin.jvm.JvmOverloads
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.jvm.JvmOverloads
 
 /**
  *
@@ -34,24 +33,28 @@ class TablesDB(client: Client) : Service(client) {
         queries: List<String>? = null,
         nestedType: KSerializer<T>,
     ): RowList<Row<T>> {
-        val apiPath = "/tablesdb/{databaseId}/tables/{tableId}/rows"
-            .replace("{databaseId}", databaseId)
-            .replace("{tableId}", tableId)
+        val apiPath =
+            "/tablesdb/{databaseId}/tables/{tableId}/rows"
+                .replace("{databaseId}", databaseId)
+                .replace("{tableId}", tableId)
 
-        val apiParams = mapOf<String, Any>(
-            "queries" to (queries ?: emptyList())
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "queries" to (queries ?: emptyList()),
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val rows = client.call(
-            HttpMethod.Get,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<RowList<JsonElement>>() }
-        )
+        val rows =
+            client.call(
+                HttpMethod.Get,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<RowList<JsonElement>>() },
+            )
         return RowList(
             total = rows.total,
             rows = rows.rows.map { it.asRow(nestedType) },
@@ -78,7 +81,7 @@ class TablesDB(client: Client) : Service(client) {
             tableId,
             queries,
             nestedType = JsonElement.serializer(),
-            )
+        )
 
     /**
      * Create a new Row. Before using this route, you should create a new table resource using either a [server integration](https://appwrite.io/docs/server/tablesdb#tablesDBCreateTable) API or directly from your database console.
@@ -99,26 +102,30 @@ class TablesDB(client: Client) : Service(client) {
         permissions: List<String>? = null,
         nestedType: KSerializer<T>,
     ): Row<T> {
-        val apiPath = "/tablesdb/{databaseId}/tables/{tableId}/rows"
-            .replace("{databaseId}", databaseId)
-            .replace("{tableId}", tableId)
+        val apiPath =
+            "/tablesdb/{databaseId}/tables/{tableId}/rows"
+                .replace("{databaseId}", databaseId)
+                .replace("{tableId}", tableId)
 
-        val apiParams = mapOf(
-            "rowId" to rowId,
-            "data" to json.encodeToString(nestedType, data),
-            "permissions" to (permissions ?: emptyList<String>())
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf(
+                "rowId" to rowId,
+                "data" to json.encodeToString(nestedType, data),
+                "permissions" to (permissions ?: emptyList<String>()),
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val response = client.call(
-            HttpMethod.Post,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() }
-        )
+        val response =
+            client.call(
+                HttpMethod.Post,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            )
         return response.asRow(nestedType)
     }
 
@@ -148,7 +155,7 @@ class TablesDB(client: Client) : Service(client) {
             data,
             permissions,
             nestedType = JsonElement.serializer(),
-    )
+        )
 
     /**
      * Get a row by its unique ID. This endpoint response returns a JSON object with the row data.
@@ -167,25 +174,29 @@ class TablesDB(client: Client) : Service(client) {
         queries: List<String>? = null,
         nestedType: KSerializer<T>,
     ): Row<T> {
-        val apiPath = "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}"
-            .replace("{databaseId}", databaseId)
-            .replace("{tableId}", tableId)
-            .replace("{rowId}", rowId)
+        val apiPath =
+            "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}"
+                .replace("{databaseId}", databaseId)
+                .replace("{tableId}", tableId)
+                .replace("{rowId}", rowId)
 
-        val apiParams = mapOf<String, Any>(
-            "queries" to (queries ?: emptyList())
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "queries" to (queries ?: emptyList()),
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val response = client.call(
-            HttpMethod.Get,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() }
-        )
+        val response =
+            client.call(
+                HttpMethod.Get,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            )
         return response.asRow(nestedType)
     }
 
@@ -233,26 +244,30 @@ class TablesDB(client: Client) : Service(client) {
         permissions: List<String>? = null,
         nestedType: KSerializer<T>,
     ): Row<T> {
-        val apiPath = "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}"
-            .replace("{databaseId}", databaseId)
-            .replace("{tableId}", tableId)
-            .replace("{rowId}", rowId)
+        val apiPath =
+            "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}"
+                .replace("{databaseId}", databaseId)
+                .replace("{tableId}", tableId)
+                .replace("{rowId}", rowId)
 
-        val apiParams = mapOf(
-            "data" to json.encodeToString(nestedType, data),
-            "permissions" to (permissions ?: emptyList<String>())
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf(
+                "data" to json.encodeToString(nestedType, data),
+                "permissions" to (permissions ?: emptyList<String>()),
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val response = client.call(
-            HttpMethod.Put,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() }
-        )
+        val response =
+            client.call(
+                HttpMethod.Put,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            )
         return response.asRow(nestedType)
     }
 
@@ -274,14 +289,15 @@ class TablesDB(client: Client) : Service(client) {
         rowId: String,
         data: JsonElement,
         permissions: List<String>? = null,
-    ): Row<JsonElement> = upsertRow(
-        databaseId,
-        tableId,
-        rowId,
-        data,
-        permissions,
-        nestedType = JsonElement.serializer(),
-    )
+    ): Row<JsonElement> =
+        upsertRow(
+            databaseId,
+            tableId,
+            rowId,
+            data,
+            permissions,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Update a row by its unique ID. Using the patch method you can pass only specific fields that will get updated.
@@ -302,26 +318,30 @@ class TablesDB(client: Client) : Service(client) {
         permissions: List<String>? = null,
         nestedType: KSerializer<T>,
     ): Row<T> {
-        val apiPath = "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}"
-            .replace("{databaseId}", databaseId)
-            .replace("{tableId}", tableId)
-            .replace("{rowId}", rowId)
+        val apiPath =
+            "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}"
+                .replace("{databaseId}", databaseId)
+                .replace("{tableId}", tableId)
+                .replace("{rowId}", rowId)
 
-        val apiParams = mapOf(
-            "data" to json.encodeToString(nestedType, data),
-            "permissions" to (permissions ?: emptyList<String>())
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf(
+                "data" to json.encodeToString(nestedType, data),
+                "permissions" to (permissions ?: emptyList<String>()),
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val response = client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() }
-        )
+        val response =
+            client.call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            )
         return response.asRow(nestedType)
     }
 
@@ -366,23 +386,24 @@ class TablesDB(client: Client) : Service(client) {
         tableId: String,
         rowId: String,
     ): Any {
-        val apiPath = "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}"
-            .replace("{databaseId}", databaseId)
-            .replace("{tableId}", tableId)
-            .replace("{rowId}", rowId)
+        val apiPath =
+            "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}"
+                .replace("{databaseId}", databaseId)
+                .replace("{tableId}", tableId)
+                .replace("{rowId}", rowId)
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Delete,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { }
+            converter = { },
         )
     }
-
 
     /**
      * Decrement a specific column of a row by a given value.
@@ -405,26 +426,30 @@ class TablesDB(client: Client) : Service(client) {
         min: Double? = null,
         nestedType: KSerializer<T>,
     ): Row<T> {
-        val apiPath = "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}/{column}/decrement"
-            .replace("{databaseId}", databaseId)
-            .replace("{tableId}", tableId)
-            .replace("{rowId}", rowId)
-            .replace("{column}", column)
+        val apiPath =
+            "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}/{column}/decrement"
+                .replace("{databaseId}", databaseId)
+                .replace("{tableId}", tableId)
+                .replace("{rowId}", rowId)
+                .replace("{column}", column)
 
-        val apiParams = buildMap<String, Any> {
-            if (value != null) put("value", value)
-            if (min != null) put("min", min)
-        }
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
-        val response = client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() }
-        )
+        val apiParams =
+            buildMap<String, Any> {
+                if (value != null) put("value", value)
+                if (min != null) put("min", min)
+            }
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
+        val response =
+            client.call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            )
         return response.asRow(nestedType)
     }
 
@@ -448,15 +473,16 @@ class TablesDB(client: Client) : Service(client) {
         column: String,
         value: Double? = null,
         min: Double? = null,
-    ): Row<JsonElement> = decrementRowColumn(
-        databaseId,
-        tableId,
-        rowId,
-        column,
-        value,
-        min,
-        nestedType = JsonElement.serializer(),
-    )
+    ): Row<JsonElement> =
+        decrementRowColumn(
+            databaseId,
+            tableId,
+            rowId,
+            column,
+            value,
+            min,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Increment a specific column of a row by a given value.
@@ -479,27 +505,31 @@ class TablesDB(client: Client) : Service(client) {
         max: Double? = null,
         nestedType: KSerializer<T>,
     ): Row<T> {
-        val apiPath = "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}/{column}/increment"
-            .replace("{databaseId}", databaseId)
-            .replace("{tableId}", tableId)
-            .replace("{rowId}", rowId)
-            .replace("{column}", column)
+        val apiPath =
+            "/tablesdb/{databaseId}/tables/{tableId}/rows/{rowId}/{column}/increment"
+                .replace("{databaseId}", databaseId)
+                .replace("{tableId}", tableId)
+                .replace("{rowId}", rowId)
+                .replace("{column}", column)
 
-        val apiParams = buildMap<String, Any> {
-            if (value != null) put("value", value)
-            if (max != null) put("max", max)
-        }
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            buildMap<String, Any> {
+                if (value != null) put("value", value)
+                if (max != null) put("max", max)
+            }
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
-        val response = client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() }
-        )
+        val response =
+            client.call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            )
         return response.asRow(nestedType)
     }
 
@@ -523,14 +553,14 @@ class TablesDB(client: Client) : Service(client) {
         column: String,
         value: Double? = null,
         max: Double? = null,
-    ): Row<JsonElement> = incrementRowColumn(
-        databaseId,
-        tableId,
-        rowId,
-        column,
-        value,
-        max,
-        nestedType = JsonElement.serializer(),
-    )
-
+    ): Row<JsonElement> =
+        incrementRowColumn(
+            databaseId,
+            tableId,
+            rowId,
+            column,
+            value,
+            max,
+            nestedType = JsonElement.serializer(),
+        )
 }

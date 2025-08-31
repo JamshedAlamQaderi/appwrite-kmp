@@ -4,19 +4,32 @@ import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
 import com.jamshedalamqaderi.kmp.appwrite.extensions.encodeUnknownValue
 import com.jamshedalamqaderi.kmp.appwrite.models.Progress
 import com.jamshedalamqaderi.kmp.appwrite.stores.CachedCookiesStorage
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.cookies.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.onDownload
+import io.ktor.client.plugins.onUpload
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.pingInterval
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.forms.InputProvider
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.parameter
+import io.ktor.client.request.prepareRequest
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -205,7 +218,7 @@ class Client(
         method: HttpMethod,
         path: String,
         headers: Map<String, String> = mapOf(),
-        params: Map<String, Any> = emptyMap(),
+        params: Map<String, Any?> = emptyMap(),
         onUpload: ((Progress) -> Unit)? = null,
         onDownload: ((Progress) -> Unit)? = null,
         converter: (suspend (HttpResponse) -> T)? = null,
@@ -249,15 +262,14 @@ class Client(
                     throw AppwriteException(
                         message = response.bodyAsText(),
                         code = response.status.value,
-                        type = response.status.description
+                        type = response.status.description,
                     )
                 }
             }
         }
     }
 
-
-    private fun HttpRequestBuilder.prepareGetParams(params: Map<String, Any>) {
+    private fun HttpRequestBuilder.prepareGetParams(params: Map<String, Any?>) {
         for ((key, value) in params) {
             when (value) {
                 is List<*> -> {
@@ -273,72 +285,74 @@ class Client(
         }
     }
 
-    private fun HttpRequestBuilder.prepareMultiDataFormParams(params: Map<String, Any>) {
-        val formData = formData {
-            for ((key, value) in params) {
-                when (value) {
-                    is List<*> -> {
-                        for (item in value) {
-                            append("$key[]", item.toString())
+    private fun HttpRequestBuilder.prepareMultiDataFormParams(params: Map<String, Any?>) {
+        val formData =
+            formData {
+                for ((key, value) in params) {
+                    when (value) {
+                        is List<*> -> {
+                            for (item in value) {
+                                append("$key[]", item.toString())
+                            }
                         }
-                    }
 
-                    is Path -> {
-                        append(
-                            "file",
-                            InputProvider(
-                                SystemFileSystem.metadataOrNull(value)?.size,
-                            ) {
-                                SystemFileSystem.source(value)
-                                    .buffered()
-                            },
-                            Headers.build {
-                                append(
-                                    HttpHeaders.ContentType,
-                                    ContentType.Application.OctetStream.toString(),
-                                )
-                                append(
-                                    HttpHeaders.ContentDisposition,
-                                    "filename=${value.name}",
-                                )
-                            },
-                        )
-                    }
+                        is Path -> {
+                            append(
+                                key,
+                                InputProvider(
+                                    SystemFileSystem.metadataOrNull(value)?.size,
+                                ) {
+                                    SystemFileSystem.source(value)
+                                        .buffered()
+                                },
+                                Headers.build {
+                                    append(
+                                        HttpHeaders.ContentType,
+                                        ContentType.Application.OctetStream.toString(),
+                                    )
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "filename=${value.name}",
+                                    )
+                                },
+                            )
+                        }
 
-                    else -> {
-                        append(key, value.toString())
+                        else -> {
+                            append(key, value.toString())
+                        }
                     }
                 }
             }
-        }
         setBody(MultiPartFormDataContent(formData))
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    private fun HttpRequestBuilder.preparePostParams(params: Map<String, Any>) {
-        val bodyMap = buildJsonObject {
-            for ((key, value) in params) {
-                when (value) {
-                    is List<*> -> {
-                        putJsonArray(key) {
-                            addAll(value.mapNotNull { it?.encodeUnknownValue() })
-                        }
-                    }
-
-                    is Map<*, *> -> {
-                        putJsonObject(key) {
-                            value.forEach { (k, v) ->
-                                v?.encodeUnknownValue()?.let { put(k.toString(), it) }
+    private fun HttpRequestBuilder.preparePostParams(params: Map<String, Any?>) {
+        val bodyMap =
+            buildJsonObject {
+                for ((key, value) in params) {
+                    when (value) {
+                        is List<*> -> {
+                            putJsonArray(key) {
+                                addAll(value.mapNotNull { it?.encodeUnknownValue() })
                             }
                         }
-                    }
 
-                    else -> {
-                        put(key, value.encodeUnknownValue())
+                        is Map<*, *> -> {
+                            putJsonObject(key) {
+                                value.forEach { (k, v) ->
+                                    v?.encodeUnknownValue()?.let { put(k.toString(), it) }
+                                }
+                            }
+                        }
+
+                        else -> {
+                            value?.encodeUnknownValue()?.let { put(key, it) }
+                        }
                     }
                 }
             }
-        }
         setBody(bodyMap)
     }
 

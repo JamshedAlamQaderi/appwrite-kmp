@@ -5,9 +5,8 @@ import com.jamshedalamqaderi.kmp.appwrite.Service
 import com.jamshedalamqaderi.kmp.appwrite.enums.Browser
 import com.jamshedalamqaderi.kmp.appwrite.enums.CreditCard
 import com.jamshedalamqaderi.kmp.appwrite.enums.Flag
-import io.ktor.client.call.*
+import io.ktor.client.statement.bodyAsBytes
 import io.ktor.http.HttpMethod
-import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -36,18 +35,19 @@ class Avatars(client: Client) : Service(client) {
             "/avatars/browsers/{code}"
                 .replace("{code}", code.value)
 
-        val apiParams = buildMap<String, Any> {
-            if (width != null) put("width", width)
-            if (height != null) put("height", height)
-            if (quality != null) put("quality", quality)
-            client.config["project"]?.let { put("project", it) }
-        }
+        val apiParams =
+            buildMap<String, Any> {
+                if (width != null) put("width", width)
+                if (height != null) put("height", height)
+                if (quality != null) put("quality", quality)
+                client.config["project"]?.let { put("project", it) }
+            }
         return client.call(
             HttpMethod.Get,
             apiPath,
             headers = emptyMap(),
             params = apiParams,
-            converter = { it.body<ByteArray>() }
+            converter = { it.bodyAsBytes() },
         )
     }
 
@@ -73,18 +73,19 @@ class Avatars(client: Client) : Service(client) {
             "/avatars/credit-cards/{code}"
                 .replace("{code}", code.value)
 
-        val apiParams = buildMap<String, Any> {
-            if (width != null) put("width", width)
-            if (height != null) put("height", height)
-            if (quality != null) put("quality", quality)
-            client.config["project"]?.let { put("project", it) }
-        }
+        val apiParams =
+            buildMap<String, Any> {
+                if (width != null) put("width", width)
+                if (height != null) put("height", height)
+                if (quality != null) put("quality", quality)
+                client.config["project"]?.let { put("project", it) }
+            }
         return client.call(
             HttpMethod.Get,
             apiPath,
             headers = emptyMap(),
             params = apiParams,
-            converter = { it.body<ByteArray>() }
+            converter = { it.bodyAsBytes() },
         )
     }
 
@@ -99,16 +100,17 @@ class Avatars(client: Client) : Service(client) {
     suspend fun getFavicon(url: String): ByteArray {
         val apiPath = "/avatars/favicon"
 
-        val apiParams = buildMap<String, Any> {
-            put("url", url)
-            client.config["project"]?.let { put("project", it) }
-        }
+        val apiParams =
+            buildMap<String, Any> {
+                put("url", url)
+                client.config["project"]?.let { put("project", it) }
+            }
         return client.call(
             HttpMethod.Get,
             apiPath,
             headers = emptyMap(),
             params = apiParams,
-            converter = { it.body<ByteArray>() }
+            converter = { it.bodyAsBytes() },
         )
     }
 
@@ -134,18 +136,19 @@ class Avatars(client: Client) : Service(client) {
             "/avatars/flags/{code}"
                 .replace("{code}", code.value)
 
-        val apiParams = buildMap<String, Any> {
-            if (width != null) put("width", width)
-            if (height != null) put("height", height)
-            if (quality != null) put("quality", quality)
-            client.config["project"]?.let { put("project", it) }
-        }
+        val apiParams =
+            buildMap<String, Any> {
+                if (width != null) put("width", width)
+                if (height != null) put("height", height)
+                if (quality != null) put("quality", quality)
+                client.config["project"]?.let { put("project", it) }
+            }
         return client.call(
             HttpMethod.Get,
             apiPath,
             headers = emptyMap(),
             params = apiParams,
-            converter = { it.body<ByteArray>() }
+            converter = { it.bodyAsBytes() },
         )
     }
 
@@ -167,18 +170,19 @@ class Avatars(client: Client) : Service(client) {
     ): ByteArray {
         val apiPath = "/avatars/image"
 
-        val apiParams = buildMap<String, Any> {
-            put("url", url)
-            if (width != null) put("width", width)
-            if (height != null) put("height", height)
-            client.config["project"]?.let { put("project", it) }
-        }
+        val apiParams =
+            buildMap<String, Any> {
+                put("url", url)
+                if (width != null) put("width", width)
+                if (height != null) put("height", height)
+                client.config["project"]?.let { put("project", it) }
+            }
         return client.call(
             HttpMethod.Get,
             apiPath,
             headers = emptyMap(),
             params = apiParams,
-            converter = { it.body<ByteArray>() }
+            converter = { it.bodyAsBytes() },
         )
     }
 
@@ -202,19 +206,20 @@ class Avatars(client: Client) : Service(client) {
     ): ByteArray {
         val apiPath = "/avatars/initials"
 
-        val apiParams = buildMap<String, Any> {
-            if (name != null) put("name", name)
-            if (width != null) put("width", width)
-            if (height != null) put("height", height)
-            if (background != null) put("background", background)
-            client.config["project"]?.let { put("project", it) }
-        }
+        val apiParams =
+            buildMap<String, Any> {
+                if (name != null) put("name", name)
+                if (width != null) put("width", width)
+                if (height != null) put("height", height)
+                if (background != null) put("background", background)
+                client.config["project"]?.let { put("project", it) }
+            }
         return client.call(
             HttpMethod.Get,
             apiPath,
             headers = emptyMap(),
             params = apiParams,
-            converter = { it.body<ByteArray>() }
+            converter = { it.bodyAsBytes() },
         )
     }
 
@@ -238,19 +243,20 @@ class Avatars(client: Client) : Service(client) {
     ): ByteArray {
         val apiPath = "/avatars/qr"
 
-        val apiParams = buildMap<String, Any> {
-            put("text", text)
-            if (size != null) put("size", size)
-            if (margin != null) put("margin", margin)
-            if (download != null) put("download", download)
-            client.config["project"]?.let { put("project", it) }
-        }
+        val apiParams =
+            buildMap<String, Any> {
+                put("text", text)
+                if (size != null) put("size", size)
+                if (margin != null) put("margin", margin)
+                if (download != null) put("download", download)
+                client.config["project"]?.let { put("project", it) }
+            }
         return client.call(
             HttpMethod.Get,
             apiPath,
             headers = emptyMap(),
             params = apiParams,
-            converter = { it.body<ByteArray>() }
+            converter = { it.bodyAsBytes() },
         )
     }
 }

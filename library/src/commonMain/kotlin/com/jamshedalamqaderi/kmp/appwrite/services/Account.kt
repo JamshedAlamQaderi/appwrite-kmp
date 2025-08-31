@@ -7,10 +7,25 @@ import com.jamshedalamqaderi.kmp.appwrite.enums.AuthenticatorType
 import com.jamshedalamqaderi.kmp.appwrite.enums.OAuthProvider
 import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
 import com.jamshedalamqaderi.kmp.appwrite.extensions.mapSerializer
-import com.jamshedalamqaderi.kmp.appwrite.models.*
-import io.ktor.client.call.*
-import io.ktor.http.*
-import io.ktor.util.*
+import com.jamshedalamqaderi.kmp.appwrite.models.IdentityList
+import com.jamshedalamqaderi.kmp.appwrite.models.Jwt
+import com.jamshedalamqaderi.kmp.appwrite.models.LogList
+import com.jamshedalamqaderi.kmp.appwrite.models.MfaChallenge
+import com.jamshedalamqaderi.kmp.appwrite.models.MfaFactors
+import com.jamshedalamqaderi.kmp.appwrite.models.MfaRecoveryCodes
+import com.jamshedalamqaderi.kmp.appwrite.models.MfaType
+import com.jamshedalamqaderi.kmp.appwrite.models.Preferences
+import com.jamshedalamqaderi.kmp.appwrite.models.Session
+import com.jamshedalamqaderi.kmp.appwrite.models.SessionList
+import com.jamshedalamqaderi.kmp.appwrite.models.Target
+import com.jamshedalamqaderi.kmp.appwrite.models.Token
+import com.jamshedalamqaderi.kmp.appwrite.models.User
+import com.jamshedalamqaderi.kmp.appwrite.models.asPreferences
+import com.jamshedalamqaderi.kmp.appwrite.models.asPreferencesUser
+import io.ktor.client.call.body
+import io.ktor.http.HttpMethod
+import io.ktor.http.Url
+import io.ktor.util.PlatformUtils
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlin.coroutines.cancellation.CancellationException
@@ -34,13 +49,14 @@ class Account(client: Client) : Service(client) {
             mapOf(
                 "content-type" to "application/json",
             )
-        val response = client.call(
-            HttpMethod.Get,
-            apiPath,
-            apiHeaders,
-            emptyMap(),
-            converter = { it.body<User<JsonElement>>() }
-        )
+        val response =
+            client.call(
+                HttpMethod.Get,
+                apiPath,
+                apiHeaders,
+                emptyMap(),
+                converter = { it.body<User<JsonElement>>() },
+            )
         return response.asPreferencesUser(nestedType)
     }
 
@@ -78,22 +94,25 @@ class Account(client: Client) : Service(client) {
     ): User<Preferences<T>> {
         val apiPath = "/account"
 
-        val apiParams = buildMap<String, Any> {
-            put("userId", userId)
-            put("email", email)
-            put("password", password)
-            if (name != null) put("name", name)
-        }
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
-        val response = client.call(
-            HttpMethod.Post,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<User<JsonElement>>() }
-        )
+        val apiParams =
+            buildMap<String, Any> {
+                put("userId", userId)
+                put("email", email)
+                put("password", password)
+                if (name != null) put("name", name)
+            }
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
+        val response =
+            client.call(
+                HttpMethod.Post,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<User<JsonElement>>() },
+            )
         return response.asPreferencesUser(nestedType)
     }
 
@@ -140,20 +159,23 @@ class Account(client: Client) : Service(client) {
     ): User<Preferences<T>> {
         val apiPath = "/account/email"
 
-        val apiParams = mapOf(
-            "email" to email,
-            "password" to password,
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
-        val response = client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<User<JsonElement>>() }
-        )
+        val apiParams =
+            mapOf(
+                "email" to email,
+                "password" to password,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
+        val response =
+            client.call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<User<JsonElement>>() },
+            )
         return response.asPreferencesUser(nestedType)
     }
 
@@ -189,9 +211,10 @@ class Account(client: Client) : Service(client) {
     suspend fun listIdentities(queries: List<String>? = null): IdentityList {
         val apiPath = "/account/identities"
 
-        val apiParams = mapOf<String, Any>(
-            "queries" to (queries ?: emptyList())
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "queries" to (queries ?: emptyList()),
+            )
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -219,15 +242,16 @@ class Account(client: Client) : Service(client) {
             "/account/identities/{identityId}"
                 .replace("{identityId}", identityId)
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Delete,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = {}
+            converter = {},
         )
     }
 
@@ -250,7 +274,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<Jwt>() }
+            converter = { it.body<Jwt>() },
         )
     }
 
@@ -266,9 +290,10 @@ class Account(client: Client) : Service(client) {
     suspend fun listLogs(queries: List<String>? = null): LogList {
         val apiPath = "/account/logs"
 
-        val apiParams = mapOf<String, Any>(
-            "queries" to (queries ?: emptyList())
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "queries" to (queries ?: emptyList()),
+            )
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -279,7 +304,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<LogList>() }
+            converter = { it.body<LogList>() },
         )
     }
 
@@ -297,9 +322,10 @@ class Account(client: Client) : Service(client) {
     ): User<Preferences<T>> {
         val apiPath = "/account/mfa"
 
-        val apiParams = mapOf<String, Any>(
-            "mfa" to mfa
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "mfa" to mfa,
+            )
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -310,7 +336,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<User<JsonElement>>() }
+            converter = { it.body<User<JsonElement>>() },
         ).asPreferencesUser(nestedType)
     }
 
@@ -323,10 +349,11 @@ class Account(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
-    suspend fun updateMFA(mfa: Boolean): User<Preferences<JsonElement>> = updateMFA(
-        mfa,
-        nestedType = JsonElement.serializer(),
-    )
+    suspend fun updateMFA(mfa: Boolean): User<Preferences<JsonElement>> =
+        updateMFA(
+            mfa,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Add Authenticator
@@ -351,7 +378,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<MfaType>() }
+            converter = { it.body<MfaType>() },
         )
     }
 
@@ -373,9 +400,10 @@ class Account(client: Client) : Service(client) {
             "/account/mfa/authenticators/{type}"
                 .replace("{type}", type.value)
 
-        val apiParams = mapOf<String, Any>(
-            "otp" to otp
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "otp" to otp,
+            )
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -385,7 +413,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<User<JsonElement>>() }
+            converter = { it.body<User<JsonElement>>() },
         ).asPreferencesUser(nestedType)
     }
 
@@ -402,11 +430,12 @@ class Account(client: Client) : Service(client) {
     suspend fun updateMfaAuthenticator(
         type: AuthenticatorType,
         otp: String,
-    ): User<Preferences<JsonElement>> = updateMfaAuthenticator(
-        type,
-        otp,
-        nestedType = JsonElement.serializer(),
-    )
+    ): User<Preferences<JsonElement>> =
+        updateMfaAuthenticator(
+            type,
+            otp,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Delete Authenticator
@@ -425,9 +454,10 @@ class Account(client: Client) : Service(client) {
             "/account/mfa/authenticators/{type}"
                 .replace("{type}", type.value)
 
-        val apiParams = mapOf<String, Any>(
-            "otp" to otp
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "otp" to otp,
+            )
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -437,7 +467,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = {}
+            converter = {},
         )
     }
 
@@ -452,9 +482,10 @@ class Account(client: Client) : Service(client) {
     suspend fun createMfaChallenge(factor: AuthenticationFactor): MfaChallenge {
         val apiPath = "/account/mfa/challenge"
 
-        val apiParams = mapOf<String, Any>(
-            "factor" to factor.value
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "factor" to factor.value,
+            )
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -465,7 +496,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<MfaChallenge>() }
+            converter = { it.body<MfaChallenge>() },
         )
     }
 
@@ -484,20 +515,22 @@ class Account(client: Client) : Service(client) {
     ) {
         val apiPath = "/account/mfa/challenge"
 
-        val apiParams = mapOf<String, Any>(
-            "challengeId" to challengeId,
-            "otp" to otp
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "challengeId" to challengeId,
+                "otp" to otp,
+            )
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Put,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = {}
+            converter = {},
         )
     }
 
@@ -511,16 +544,17 @@ class Account(client: Client) : Service(client) {
     suspend fun listMfaFactors(): MfaFactors {
         val apiPath = "/account/mfa/factors"
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<MfaFactors>() }
+            converter = { it.body<MfaFactors>() },
         )
     }
 
@@ -534,15 +568,16 @@ class Account(client: Client) : Service(client) {
     suspend fun getMfaRecoveryCodes(): MfaRecoveryCodes {
         val apiPath = "/account/mfa/recovery-codes"
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Get,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<MfaRecoveryCodes>() }
+            converter = { it.body<MfaRecoveryCodes>() },
         )
     }
 
@@ -556,16 +591,17 @@ class Account(client: Client) : Service(client) {
     suspend fun createMfaRecoveryCodes(): MfaRecoveryCodes {
         val apiPath = "/account/mfa/recovery-codes"
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<MfaRecoveryCodes>() }
+            converter = { it.body<MfaRecoveryCodes>() },
         )
     }
 
@@ -579,16 +615,17 @@ class Account(client: Client) : Service(client) {
     suspend fun updateMfaRecoveryCodes(): MfaRecoveryCodes {
         val apiPath = "/account/mfa/recovery-codes"
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Patch,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<MfaRecoveryCodes>() }
+            converter = { it.body<MfaRecoveryCodes>() },
         )
     }
 
@@ -606,19 +643,21 @@ class Account(client: Client) : Service(client) {
     ): User<Preferences<T>> {
         val apiPath = "/account/name"
 
-        val apiParams = mapOf<String, Any>(
-            "name" to name
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "name" to name,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Patch,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<User<JsonElement>>() }
+            converter = { it.body<User<JsonElement>>() },
         ).asPreferencesUser(nestedType)
     }
 
@@ -631,10 +670,11 @@ class Account(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
-    suspend fun updateName(name: String): User<Preferences<JsonElement>> = updateName(
-        name,
-        nestedType = JsonElement.serializer(),
-    )
+    suspend fun updateName(name: String): User<Preferences<JsonElement>> =
+        updateName(
+            name,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Update password
@@ -653,22 +693,24 @@ class Account(client: Client) : Service(client) {
     ): User<Preferences<T>> {
         val apiPath = "/account/password"
 
-        val apiParams = buildMap<String, Any> {
-            put("password", password)
-            if (oldPassword != null) {
-                put("oldPassword", oldPassword)
+        val apiParams =
+            buildMap<String, Any> {
+                put("password", password)
+                if (oldPassword != null) {
+                    put("oldPassword", oldPassword)
+                }
             }
-        }
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Patch,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<User<JsonElement>>() }
+            converter = { it.body<User<JsonElement>>() },
         ).asPreferencesUser(nestedType)
     }
 
@@ -686,11 +728,12 @@ class Account(client: Client) : Service(client) {
     suspend fun updatePassword(
         password: String,
         oldPassword: String? = null,
-    ): User<Preferences<JsonElement>> = updatePassword(
-        password,
-        oldPassword,
-        nestedType = JsonElement.serializer(),
-    )
+    ): User<Preferences<JsonElement>> =
+        updatePassword(
+            password,
+            oldPassword,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Update phone
@@ -708,21 +751,23 @@ class Account(client: Client) : Service(client) {
     ): User<Preferences<T>> {
         val apiPath = "/account/phone"
 
-        val apiParams = mapOf<String, Any>(
-            "phone" to phone,
-            "password" to password,
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "phone" to phone,
+                "password" to password,
+            )
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Patch,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<User<JsonElement>>() }
+            converter = { it.body<User<JsonElement>>() },
         ).asPreferencesUser(nestedType)
     }
 
@@ -739,11 +784,12 @@ class Account(client: Client) : Service(client) {
     suspend fun updatePhone(
         phone: String,
         password: String,
-    ): User<Preferences<JsonElement>> = updatePhone(
-        phone,
-        password,
-        nestedType = JsonElement.serializer(),
-    )
+    ): User<Preferences<JsonElement>> =
+        updatePhone(
+            phone,
+            password,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Get account preferences
@@ -755,16 +801,17 @@ class Account(client: Client) : Service(client) {
     suspend fun <T> getPrefs(nestedType: KSerializer<T>): Preferences<T> {
         val apiPath = "/account/prefs"
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<JsonElement>() }
+            converter = { it.body<JsonElement>() },
         ).asPreferences(nestedType)
     }
 
@@ -776,9 +823,10 @@ class Account(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.Preferences<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
-    suspend fun getPrefs(): Preferences<JsonElement> = getPrefs(
-        nestedType = JsonElement.serializer(),
-    )
+    suspend fun getPrefs(): Preferences<JsonElement> =
+        getPrefs(
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Update preferences
@@ -794,19 +842,21 @@ class Account(client: Client) : Service(client) {
     ): User<Preferences<T>> {
         val apiPath = "/account/prefs"
 
-        val apiParams = mapOf<String, Any>(
-            "prefs" to prefs
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "prefs" to prefs,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Patch,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<User<JsonElement>>() }
+            converter = { it.body<User<JsonElement>>() },
         ).asPreferencesUser(nestedType)
     }
 
@@ -819,10 +869,11 @@ class Account(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
-    suspend fun updatePrefs(prefs: Map<String, Any>): User<Preferences<JsonElement>> = updatePrefs(
-        prefs,
-        nestedType = JsonElement.serializer(),
-    )
+    suspend fun updatePrefs(prefs: Map<String, Any>): User<Preferences<JsonElement>> =
+        updatePrefs(
+            prefs,
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Create password recovery
@@ -839,20 +890,22 @@ class Account(client: Client) : Service(client) {
     ): Token {
         val apiPath = "/account/recovery"
 
-        val apiParams = mapOf<String, Any>(
-            "email" to email,
-            "url" to url,
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json"
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "email" to email,
+                "url" to url,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Token>() }
+            converter = { it.body<Token>() },
         )
     }
 
@@ -873,22 +926,24 @@ class Account(client: Client) : Service(client) {
     ): Token {
         val apiPath = "/account/recovery"
 
-        val apiParams = mapOf<String, Any>(
-            "userId" to userId,
-            "secret" to secret,
-            "password" to password,
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "userId" to userId,
+                "secret" to secret,
+                "password" to password,
+            )
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Put,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Token>() }
+            converter = { it.body<Token>() },
         )
     }
 
@@ -912,7 +967,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<SessionList>() }
+            converter = { it.body<SessionList>() },
         )
     }
 
@@ -926,15 +981,16 @@ class Account(client: Client) : Service(client) {
     suspend fun deleteSessions() {
         val apiPath = "/account/sessions"
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Delete,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { }
+            converter = { },
         )
     }
 
@@ -958,7 +1014,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<Session>() }
+            converter = { it.body<Session>() },
         )
     }
 
@@ -977,20 +1033,22 @@ class Account(client: Client) : Service(client) {
     ): Session {
         val apiPath = "/account/sessions/email"
 
-        val apiParams = mapOf<String, Any>(
-            "email" to email,
-            "password" to password,
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "email" to email,
+                "password" to password,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Session>() }
+            converter = { it.body<Session>() },
         )
     }
 
@@ -1009,10 +1067,11 @@ class Account(client: Client) : Service(client) {
     ): Session {
         val apiPath = "/account/sessions/magic-url"
 
-        val apiParams = mapOf<String, Any>(
-            "userId" to userId,
-            "secret" to secret,
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "userId" to userId,
+                "secret" to secret,
+            )
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -1023,7 +1082,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Session>() }
+            converter = { it.body<Session>() },
         )
     }
 
@@ -1046,12 +1105,13 @@ class Account(client: Client) : Service(client) {
         val apiPath =
             "/account/sessions/oauth2/{provider}"
                 .replace("{provider}", provider.value)
-        val apiParams = buildMap {
-            success?.let { put("success", it) }
-            failure?.let { put("failure", it) }
-            scopes?.let { put("scopes", it) }
-            client.config["project"]?.let { put("project", it) }
-        }
+        val apiParams =
+            buildMap {
+                success?.let { put("success", it) }
+                failure?.let { put("failure", it) }
+                scopes?.let { put("scopes", it) }
+                client.config["project"]?.let { put("project", it) }
+            }
         val apiQuery = mutableListOf<String>()
         apiParams.forEach {
             when (it.value) {
@@ -1117,20 +1177,22 @@ class Account(client: Client) : Service(client) {
     ): Session {
         val apiPath = "/account/sessions/phone"
 
-        val apiParams = mapOf<String, Any>(
-            "userId" to userId,
-            "secret" to secret,
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json"
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "userId" to userId,
+                "secret" to secret,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Put,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Session>() }
+            converter = { it.body<Session>() },
         )
     }
 
@@ -1149,20 +1211,22 @@ class Account(client: Client) : Service(client) {
     ): Session {
         val apiPath = "/account/sessions/token"
 
-        val apiParams = mapOf<String, Any>(
-            "userId" to userId,
-            "secret" to secret,
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "userId" to userId,
+                "secret" to secret,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Session>() }
+            converter = { it.body<Session>() },
         )
     }
 
@@ -1179,16 +1243,17 @@ class Account(client: Client) : Service(client) {
             "/account/sessions/{sessionId}"
                 .replace("{sessionId}", sessionId)
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<Session>() }
+            converter = { it.body<Session>() },
         )
     }
 
@@ -1205,16 +1270,17 @@ class Account(client: Client) : Service(client) {
             "/account/sessions/{sessionId}"
                 .replace("{sessionId}", sessionId)
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Patch,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<Session>() }
+            converter = { it.body<Session>() },
         )
     }
 
@@ -1227,18 +1293,20 @@ class Account(client: Client) : Service(client) {
      * @return [Any]
      */
     suspend fun deleteSession(sessionId: String) {
-        val apiPath = "/account/sessions/{sessionId}"
-            .replace("{sessionId}", sessionId)
+        val apiPath =
+            "/account/sessions/{sessionId}"
+                .replace("{sessionId}", sessionId)
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Delete,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = {}
+            converter = {},
         )
     }
 
@@ -1252,16 +1320,17 @@ class Account(client: Client) : Service(client) {
     suspend fun <T> updateStatus(nestedType: KSerializer<T>): User<Preferences<T>> {
         val apiPath = "/account/status"
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Patch,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<User<JsonElement>>() }
+            converter = { it.body<User<JsonElement>>() },
         ).asPreferencesUser(nestedType)
     }
 
@@ -1273,9 +1342,10 @@ class Account(client: Client) : Service(client) {
      * @return [com.jamshedalamqaderi.kmp.appwrite.models.User<T>]
      */
     @Throws(AppwriteException::class, CancellationException::class)
-    suspend fun updateStatus(): User<Preferences<JsonElement>> = updateStatus(
-        nestedType = JsonElement.serializer(),
-    )
+    suspend fun updateStatus(): User<Preferences<JsonElement>> =
+        updateStatus(
+            nestedType = JsonElement.serializer(),
+        )
 
     /**
      * Create a push target
@@ -1295,11 +1365,12 @@ class Account(client: Client) : Service(client) {
     ): Target {
         val apiPath = "/account/targets/push"
 
-        val apiParams = buildMap<String, Any> {
-            put("targetId", targetId)
-            put("identifier", identifier)
-            providerId?.let { put("providerId", it) }
-        }
+        val apiParams =
+            buildMap<String, Any> {
+                put("targetId", targetId)
+                put("identifier", identifier)
+                providerId?.let { put("providerId", it) }
+            }
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -1309,7 +1380,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Target>() }
+            converter = { it.body<Target>() },
         )
     }
 
@@ -1326,21 +1397,24 @@ class Account(client: Client) : Service(client) {
         targetId: String,
         identifier: String,
     ): Target {
-        val apiPath = "/account/targets/{targetId}/push"
-            .replace("{targetId}", targetId)
+        val apiPath =
+            "/account/targets/{targetId}/push"
+                .replace("{targetId}", targetId)
 
-        val apiParams = mapOf<String, Any>(
-            "identifier" to identifier,
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "identifier" to identifier,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Put,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Target>() }
+            converter = { it.body<Target>() },
         )
     }
 
@@ -1353,18 +1427,20 @@ class Account(client: Client) : Service(client) {
      * @return [Unit]
      */
     suspend fun deletePushTarget(targetId: String) {
-        val apiPath = "/account/targets/{targetId}/push"
-            .replace("{targetId}", targetId)
+        val apiPath =
+            "/account/targets/{targetId}/push"
+                .replace("{targetId}", targetId)
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Delete,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = {}
+            converter = {},
         )
     }
 
@@ -1386,11 +1462,12 @@ class Account(client: Client) : Service(client) {
     ): Token {
         val apiPath = "/account/tokens/email"
 
-        val apiParams = buildMap {
-            put("userId", userId)
-            put("email", email)
-            phrase?.let { put("phrase", it) }
-        }
+        val apiParams =
+            buildMap {
+                put("userId", userId)
+                put("email", email)
+                phrase?.let { put("phrase", it) }
+            }
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -1401,7 +1478,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Token>() }
+            converter = { it.body<Token>() },
         )
     }
 
@@ -1425,12 +1502,13 @@ class Account(client: Client) : Service(client) {
     ): Token {
         val apiPath = "/account/tokens/magic-url"
 
-        val apiParams = buildMap {
-            put("userId", userId)
-            put("email", email)
-            url?.let { put("url", it) }
-            phrase?.let { put("phrase", it) }
-        }
+        val apiParams =
+            buildMap {
+                put("userId", userId)
+                put("email", email)
+                url?.let { put("url", it) }
+                phrase?.let { put("phrase", it) }
+            }
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -1441,7 +1519,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Token>() }
+            converter = { it.body<Token>() },
         )
     }
 
@@ -1465,12 +1543,13 @@ class Account(client: Client) : Service(client) {
             "/account/tokens/oauth2/{provider}"
                 .replace("{provider}", provider.value)
 
-        val apiParams = mapOf(
-            "success" to success,
-            "failure" to failure,
-            "scopes" to scopes,
-            "project" to client.config["project"],
-        )
+        val apiParams =
+            mapOf(
+                "success" to success,
+                "failure" to failure,
+                "scopes" to scopes,
+                "project" to client.config["project"],
+            )
         val apiQuery = mutableListOf<String>()
         apiParams.forEach {
             when (it.value) {
@@ -1539,20 +1618,22 @@ class Account(client: Client) : Service(client) {
     ): Token {
         val apiPath = "/account/tokens/phone"
 
-        val apiParams = mapOf<String, Any>(
-            "userId" to userId,
-            "phone" to phone,
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "userId" to userId,
+                "phone" to phone,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Token>() }
+            converter = { it.body<Token>() },
         )
     }
 
@@ -1567,9 +1648,10 @@ class Account(client: Client) : Service(client) {
     suspend fun createVerification(url: String): Token {
         val apiPath = "/account/verification"
 
-        val apiParams = mapOf<String, Any>(
-            "url" to url,
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "url" to url,
+            )
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -1580,7 +1662,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Token>() }
+            converter = { it.body<Token>() },
         )
     }
 
@@ -1599,10 +1681,11 @@ class Account(client: Client) : Service(client) {
     ): Token {
         val apiPath = "/account/verification"
 
-        val apiParams = mapOf<String, Any>(
-            "userId" to userId,
-            "secret" to secret,
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "userId" to userId,
+                "secret" to secret,
+            )
         val apiHeaders =
             mapOf(
                 "content-type" to "application/json",
@@ -1613,7 +1696,7 @@ class Account(client: Client) : Service(client) {
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Token>() }
+            converter = { it.body<Token>() },
         )
     }
 
@@ -1627,16 +1710,17 @@ class Account(client: Client) : Service(client) {
     suspend fun createPhoneVerification(): Token {
         val apiPath = "/account/verification/phone"
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<Token>() }
+            converter = { it.body<Token>() },
         )
     }
 
@@ -1655,20 +1739,22 @@ class Account(client: Client) : Service(client) {
     ): Token {
         val apiPath = "/account/verification/phone"
 
-        val apiParams = mapOf<String, Any>(
-            "userId" to userId,
-            "secret" to secret,
-        )
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            mapOf<String, Any>(
+                "userId" to userId,
+                "secret" to secret,
+            )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
 
         return client.call(
             HttpMethod.Put,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Token>() }
+            converter = { it.body<Token>() },
         )
     }
 }

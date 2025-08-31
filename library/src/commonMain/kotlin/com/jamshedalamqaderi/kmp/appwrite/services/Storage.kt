@@ -4,14 +4,21 @@ import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
 import com.jamshedalamqaderi.kmp.appwrite.enums.ImageFormat
 import com.jamshedalamqaderi.kmp.appwrite.enums.ImageGravity
-import io.ktor.client.call.*
 import com.jamshedalamqaderi.kmp.appwrite.models.File
 import com.jamshedalamqaderi.kmp.appwrite.models.FileList
 import com.jamshedalamqaderi.kmp.appwrite.models.Progress
+import io.ktor.client.call.body
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpMethod
+import io.ktor.http.contentType
+import io.ktor.http.fileExtensions
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.InternalAPI
+import io.ktor.utils.io.readAvailable
+import kotlinx.io.buffered
 import kotlinx.io.files.Path
-import kotlinx.serialization.builtins.ByteArraySerializer
-import kotlinx.serialization.json.JsonElement
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.files.SystemTemporaryDirectory
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -26,7 +33,7 @@ class Storage(client: Client) : Service(client) {
      * @param bucketId Storage bucket unique ID. You can create a new storage bucket using the Storage service [server integration](https://appwrite.io/docs/server/storage#createBucket).
      * @param queries Array of query strings generated using the Query class provided by the SDK. [Learn more about queries](https://appwrite.io/docs/queries). Maximum of 100 queries are allowed, each 4096 characters long. You may filter on the following attributes: name, signature, mimeType, sizeOriginal, chunksTotal, chunksUploaded
      * @param search Search term to filter your list results. Max length: 256 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.FileList]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.FileList]
      */
     @JvmOverloads
     suspend fun listFiles(
@@ -39,21 +46,21 @@ class Storage(client: Client) : Service(client) {
                 .replace("{bucketId}", bucketId)
 
         val apiParams =
-            listOf(
-                ClientParam.ListParam("queries", queries ?: emptyList()),
-                ClientParam.StringParam("search", search),
+            mapOf(
+                "queries" to queries,
+                "search" to search,
             )
         val apiHeaders =
-            mutableMapOf(
+            mapOf(
                 "content-type" to "application/json",
             )
 
         return client.call(
             HttpMethod.Get,
             apiPath,
-            FileList.serializer(),
             apiHeaders,
             apiParams,
+            converter = { it.body<FileList>() },
         )
     }
 
@@ -66,7 +73,7 @@ class Storage(client: Client) : Service(client) {
      * @param fileId File ID. Choose a custom ID or generate a random ID with `ID.unique()`. Valid chars are a-z, A-Z, 0-9, period, hyphen, and underscore. Can't start with a special char. Max length is 36 chars.
      * @param file Binary file. Appwrite SDKs provide helpers to handle file input. [Learn about file input](https://appwrite.io/docs/products/storage/upload-download#input-file).
      * @param permissions An array of permission strings. By default, only the current user is granted all permissions. [Learn more about permissions](https://appwrite.io/docs/permissions).
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.File]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.File]
      */
     @JvmOverloads
     suspend fun createFile(
@@ -81,23 +88,23 @@ class Storage(client: Client) : Service(client) {
                 .replace("{bucketId}", bucketId)
 
         val apiParams =
-            listOf(
-                ClientParam.StringParam("fileId", fileId),
-                ClientParam.FileParam(file),
-                ClientParam.ListParam("permissions", permissions ?: emptyList()),
+            mapOf(
+                "fileId" to fileId,
+                "file" to file,
+                "permissions" to permissions,
             )
         val apiHeaders =
-            mutableMapOf(
+            mapOf(
                 "content-type" to "multipart/form-data",
             )
 
         return client.call(
             HttpMethod.Post,
             apiPath,
-            File.serializer(),
             apiHeaders,
             apiParams,
             onUpload = onProgress,
+            converter = { it.body<File>() },
         )
     }
 
@@ -108,7 +115,7 @@ class Storage(client: Client) : Service(client) {
      *
      * @param bucketId Storage bucket unique ID. You can create a new storage bucket using the Storage service [server integration](https://appwrite.io/docs/server/storage#createBucket).
      * @param fileId File ID.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.File]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.File]
      */
     suspend fun getFile(
         bucketId: String,
@@ -120,14 +127,14 @@ class Storage(client: Client) : Service(client) {
                 .replace("{fileId}", fileId)
 
         val apiHeaders =
-            mutableMapOf(
+            mapOf(
                 "content-type" to "application/json",
             )
         return client.call(
             HttpMethod.Get,
             apiPath,
-            File.serializer(),
             apiHeaders,
+            converter = { it.body<File>() },
         )
     }
 
@@ -140,7 +147,7 @@ class Storage(client: Client) : Service(client) {
      * @param fileId File unique ID.
      * @param name Name of the file
      * @param permissions An array of permission string. By default, the current permissions are inherited. [Learn more about permissions](https://appwrite.io/docs/permissions).
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.File]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.File]
      */
     @JvmOverloads
     suspend fun updateFile(
@@ -155,21 +162,21 @@ class Storage(client: Client) : Service(client) {
                 .replace("{fileId}", fileId)
 
         val apiParams =
-            listOf(
-                ClientParam.StringParam("name", name),
-                ClientParam.ListParam("permissions", permissions ?: emptyList()),
+            mapOf(
+                "name" to name,
+                "permissions" to permissions,
             )
         val apiHeaders =
-            mutableMapOf(
+            mapOf(
                 "content-type" to "application/json",
             )
 
         return client.call(
             HttpMethod.Put,
             apiPath,
-            File.serializer(),
             apiHeaders,
             apiParams,
+            converter = { it.body<File>() },
         )
     }
 
@@ -180,58 +187,62 @@ class Storage(client: Client) : Service(client) {
      *
      * @param bucketId Storage bucket unique ID. You can create a new storage bucket using the Storage service [server integration](https://appwrite.io/docs/server/storage#createBucket).
      * @param fileId File ID.
-     * @return [JsonElement]
+     * @return [Unit]
      */
     suspend fun deleteFile(
         bucketId: String,
         fileId: String,
-    ): JsonElement {
+    ) {
         val apiPath =
             "/storage/buckets/{bucketId}/files/{fileId}"
                 .replace("{bucketId}", bucketId)
                 .replace("{fileId}", fileId)
 
         val apiHeaders =
-            mutableMapOf(
+            mapOf(
                 "content-type" to "application/json",
             )
         return client.call(
             HttpMethod.Get,
             apiPath,
-            JsonElement.serializer(),
             apiHeaders,
+            converter = { },
         )
     }
 
     /**
      * Get file for download
      *
-     * Get a file content by its unique ID. The endpoint response return with a &#039;Content-Disposition: attachment&#039; header that tells the browser to start downloading the file to user downloads directory.
+     * Get a file content by its unique ID. The endpoint response return with a 'Content-Disposition: attachment' header that tells the browser to start downloading the file to user downloads directory.
      *
      * @param bucketId Storage bucket ID. You can create a new storage bucket using the Storage service [server integration](https://appwrite.io/docs/server/storage#createBucket).
      * @param fileId File ID.
-     * @return [ByteArray]
+     * @return [kotlinx.io.files.Path]
      */
+    @OptIn(InternalAPI::class)
     suspend fun getFileDownload(
         bucketId: String,
         fileId: String,
         onProgress: ((Progress) -> Unit)? = null,
-    ): ByteArray {
+    ): Path {
         val apiPath =
             "/storage/buckets/{bucketId}/files/{fileId}/download"
                 .replace("{bucketId}", bucketId)
                 .replace("{fileId}", fileId)
 
         val apiParams =
-            listOf(
-                ClientParam.StringParam("project", client.config["project"]),
+            mapOf(
+                "project" to client.config["project"],
             )
+
         return client.call(
             HttpMethod.Get,
             apiPath,
-            ByteArraySerializer(),
             params = apiParams,
             onDownload = onProgress,
+            converter = { response ->
+                response.saveTo(SystemTemporaryDirectory, fileId)
+            },
         )
     }
 
@@ -253,7 +264,7 @@ class Storage(client: Client) : Service(client) {
      * @param rotation Preview image rotation in degrees. Pass an integer between -360 and 360.
      * @param background Preview image background color. Only works with transparent images (png). Use a valid HEX color, no # is needed for prefix.
      * @param output Output format type (jpeg, jpg, png, gif and webp).
-     * @return [ByteArray]
+     * @return [kotlinx.io.files.Path]
      */
     @JvmOverloads
     suspend fun getFilePreview(
@@ -271,33 +282,35 @@ class Storage(client: Client) : Service(client) {
         background: String? = null,
         output: ImageFormat? = null,
         onProgress: ((Progress) -> Unit)? = null,
-    ): ByteArray {
+    ): Path {
         val apiPath =
             "/storage/buckets/{bucketId}/files/{fileId}/preview"
                 .replace("{bucketId}", bucketId)
                 .replace("{fileId}", fileId)
 
         val apiParams =
-            listOf(
-                ClientParam.StringParam("width", width?.toString()),
-                ClientParam.StringParam("height", height?.toString()),
-                ClientParam.StringParam("gravity", gravity?.value),
-                ClientParam.StringParam("quality", quality?.toString()),
-                ClientParam.StringParam("borderWidth", borderWidth?.toString()),
-                ClientParam.StringParam("borderColor", borderColor),
-                ClientParam.StringParam("borderRadius", borderRadius?.toString()),
-                ClientParam.StringParam("opacity", opacity?.toString()),
-                ClientParam.StringParam("rotation", rotation?.toString()),
-                ClientParam.StringParam("background", background),
-                ClientParam.StringParam("output", output?.value),
-                ClientParam.StringParam("project", client.config["project"]),
-            )
+            buildMap {
+                put("width", width?.toString())
+                put("height", height?.toString())
+                put("gravity", gravity?.value)
+                put("quality", quality?.toString())
+                put("borderWidth", borderWidth?.toString())
+                put("borderColor", borderColor)
+                put("borderRadius", borderRadius?.toString())
+                put("opacity", opacity?.toString())
+                put("rotation", rotation?.toString())
+                put("background", background)
+                put("output", output?.value)
+                put("project", client.config["project"])
+            }
         return client.call(
             HttpMethod.Get,
             apiPath,
-            ByteArraySerializer(),
             params = apiParams,
             onDownload = onProgress,
+            converter = { response ->
+                response.saveTo(SystemTemporaryDirectory, fileId)
+            },
         )
     }
 
@@ -308,28 +321,73 @@ class Storage(client: Client) : Service(client) {
      *
      * @param bucketId Storage bucket unique ID. You can create a new storage bucket using the Storage service [server integration](https://appwrite.io/docs/server/storage#createBucket).
      * @param fileId File ID.
-     * @return [ByteArray]
+     * @return [kotlinx.io.files.Path]
      */
     suspend fun getFileView(
         bucketId: String,
         fileId: String,
         onProgress: ((Progress) -> Unit)? = null,
-    ): ByteArray {
+    ): Path {
         val apiPath =
             "/storage/buckets/{bucketId}/files/{fileId}/view"
                 .replace("{bucketId}", bucketId)
                 .replace("{fileId}", fileId)
 
         val apiParams =
-            listOf(
-                ClientParam.StringParam("project", client.config["project"]),
+            mapOf(
+                "project" to client.config["project"],
             )
         return client.call(
             HttpMethod.Get,
             apiPath,
-            ByteArraySerializer(),
             params = apiParams,
             onDownload = onProgress,
+            converter = {
+                it.saveTo(SystemTemporaryDirectory, fileId)
+            },
         )
+    }
+}
+
+@OptIn(InternalAPI::class)
+/**
+ * Save an HTTP response body into the given destination path.
+ * If [destination] points to a directory, the file name will be derived from [fileId]
+ * and the response content type (when available) to set an appropriate extension.
+ */
+private suspend fun HttpResponse.saveTo(
+    destination: Path,
+    fileId: String,
+): Path {
+    val destinationFile =
+        if (SystemFileSystem.metadataOrNull(destination)?.isDirectory == true) {
+            val ct = contentType()
+            val ctType = ct?.contentType
+            val supportedExtensions = ct?.fileExtensions()
+            val finalExtension =
+                supportedExtensions
+                    ?.find { ext -> ctType?.contains(ext) == true }
+                    ?: supportedExtensions?.firstOrNull()
+            val fileName = if (finalExtension != null) "$fileId.$finalExtension" else fileId
+            Path(destination, fileName)
+        } else {
+            destination
+        }
+    rawContent.saveTo(destinationFile)
+    return destinationFile
+}
+
+/**
+ * Streams this channel to a file sink in chunks to avoid high memory usage.
+ */
+private suspend fun ByteReadChannel.saveTo(destination: Path) {
+    SystemFileSystem.sink(destination).buffered().use { sink ->
+        val buffer = ByteArray(4 * 1024)
+        while (true) {
+            val count = this@saveTo.readAvailable(buffer, 0, buffer.size)
+            if (count == -1) break
+            sink.write(buffer, 0, count)
+        }
+        sink.flush()
     }
 }

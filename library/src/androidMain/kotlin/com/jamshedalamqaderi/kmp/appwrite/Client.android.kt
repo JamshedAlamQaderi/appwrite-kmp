@@ -2,8 +2,8 @@ package com.jamshedalamqaderi.kmp.appwrite
 
 import android.content.Context
 import android.content.pm.PackageManager
-import io.ktor.client.engine.*
-import io.ktor.client.engine.okhttp.*
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.okhttp.OkHttp
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 

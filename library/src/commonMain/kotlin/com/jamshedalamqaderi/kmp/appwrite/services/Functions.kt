@@ -3,9 +3,9 @@ package com.jamshedalamqaderi.kmp.appwrite.services
 import com.jamshedalamqaderi.kmp.appwrite.Client
 import com.jamshedalamqaderi.kmp.appwrite.Service
 import com.jamshedalamqaderi.kmp.appwrite.enums.ExecutionMethod
-import io.ktor.client.call.*
 import com.jamshedalamqaderi.kmp.appwrite.models.Execution
 import com.jamshedalamqaderi.kmp.appwrite.models.ExecutionList
+import io.ktor.client.call.body
 import io.ktor.http.HttpMethod
 import kotlin.jvm.JvmOverloads
 
@@ -21,7 +21,7 @@ class Functions(client: Client) : Service(client) {
      * @param functionId Function ID.
      * @param queries Array of query strings generated using the Query class provided by the SDK. [Learn more about queries](https://appwrite.io/docs/queries). Maximum of 100 queries are allowed, each 4096 characters long. You may filter on the following attributes: trigger, status, responseStatusCode, duration, requestMethod, requestPath, deploymentId
      * @param search Search term to filter your list results. Max length: 256 chars.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.ExecutionList]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.ExecutionList]
      */
     @JvmOverloads
     suspend fun listExecutions(
@@ -33,19 +33,21 @@ class Functions(client: Client) : Service(client) {
             "/functions/{functionId}/executions"
                 .replace("{functionId}", functionId)
 
-        val apiParams = buildMap<String, Any> {
-            put("queries", queries ?: emptyList<String>())
-            if (search != null) put("search", search)
-        }
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            buildMap<String, Any> {
+                put("queries", queries ?: emptyList<String>())
+                if (search != null) put("search", search)
+            }
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Get,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<ExecutionList>() }
+            converter = { it.body<ExecutionList>() },
         )
     }
 
@@ -61,7 +63,7 @@ class Functions(client: Client) : Service(client) {
      * @param method HTTP method of execution. Default value is GET.
      * @param headers HTTP headers of execution. Defaults to empty.
      * @param scheduledAt Scheduled execution time in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format. DateTime value must be in future with precision in minutes.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Execution]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Execution]
      */
     @JvmOverloads
     suspend fun createExecution(
@@ -77,23 +79,25 @@ class Functions(client: Client) : Service(client) {
             "/functions/{functionId}/executions"
                 .replace("{functionId}", functionId)
 
-        val apiParams = buildMap<String, Any> {
-            if (body != null) put("body", body)
-            if (async != null) put("async", async)
-            if (path != null) put("path", path)
-            if (method != null) put("method", method.value)
-            put("headers", headers ?: emptyMap<String, String>())
-            if (scheduledAt != null) put("scheduledAt", scheduledAt)
-        }
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiParams =
+            buildMap<String, Any> {
+                if (body != null) put("body", body)
+                if (async != null) put("async", async)
+                if (path != null) put("path", path)
+                if (method != null) put("method", method.value)
+                put("headers", headers ?: emptyMap<String, String>())
+                if (scheduledAt != null) put("scheduledAt", scheduledAt)
+            }
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Post,
             apiPath,
             apiHeaders,
             apiParams,
-            converter = { it.body<Execution>() }
+            converter = { it.body<Execution>() },
         )
     }
 
@@ -104,7 +108,7 @@ class Functions(client: Client) : Service(client) {
      *
      * @param functionId Function ID.
      * @param executionId Execution ID.
-     * @return [com.jamshedalamqaderi.appwrite.kmp.models.Execution]
+     * @return [com.jamshedalamqaderi.kmp.appwrite.models.Execution]
      */
     suspend fun getExecution(
         functionId: String,
@@ -115,15 +119,16 @@ class Functions(client: Client) : Service(client) {
                 .replace("{functionId}", functionId)
                 .replace("{executionId}", executionId)
 
-        val apiHeaders = mapOf(
-            "content-type" to "application/json",
-        )
+        val apiHeaders =
+            mapOf(
+                "content-type" to "application/json",
+            )
         return client.call(
             HttpMethod.Get,
             apiPath,
             apiHeaders,
             emptyMap(),
-            converter = { it.body<Execution>() }
+            converter = { it.body<Execution>() },
         )
     }
 }

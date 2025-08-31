@@ -13,11 +13,9 @@ data class RowList<T>(
      */
     @SerialName("total")
     val total: Long,
-
     /**
      * List of rows.
      */
     @SerialName("rows")
     val rows: List<T>,
-
-    )
+)
