@@ -6,7 +6,7 @@ import platform.Foundation.NSBundle
 import platform.Foundation.NSProcessInfo
 import platform.UIKit.UIDevice
 
-internal actual fun httpEngine(): HttpClientEngine = Darwin.create()
+internal actual fun httpEngine(selfSigned: Boolean): HttpClientEngine = Darwin.create()
 
 internal actual fun defaultHeaders(): MutableMap<String, String> {
     return mutableMapOf(
