@@ -3,6 +3,7 @@ package com.jamshedalamqaderi.kmp.appwrite
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.darwin.Darwin
 import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSBundle
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSURLAuthenticationChallenge
@@ -15,13 +16,14 @@ import platform.Foundation.NSURLSessionTask
 import platform.Foundation.create
 import platform.Foundation.serverTrust
 import platform.UIKit.UIDevice
+import platform.darwin.NSUInteger
 
-@OptIn(BetaInteropApi::class)
+@OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
 @Suppress("MISSING_DEPENDENCY_CLASS_IN_EXPRESSION_TYPE")
 internal actual fun httpEngine(selfSigned: Boolean): HttpClientEngine = Darwin.create {
     if (selfSigned) {
-        val useCredential = NSURLSessionAuthChallengeUseCredential.toInt()
-        val performDefault = NSURLSessionAuthChallengePerformDefaultHandling.toInt()
+        val useCredential = NSURLSessionAuthChallengeUseCredential
+        val performDefault = NSURLSessionAuthChallengePerformDefaultHandling
         handleChallenge { _: NSURLSession, _: NSURLSessionTask?, challenge: NSURLAuthenticationChallenge, completionHandler ->
             val method = challenge.protectionSpace.authenticationMethod
             if (method == NSURLAuthenticationMethodServerTrust) {
@@ -38,7 +40,7 @@ internal actual fun httpEngine(selfSigned: Boolean): HttpClientEngine = Darwin.c
         }
     } else {
         handleChallenge { _: NSURLSession, _: NSURLSessionTask?, _: NSURLAuthenticationChallenge, completionHandler ->
-            completionHandler(NSURLSessionAuthChallengePerformDefaultHandling.toInt(), null)
+            completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, null)
         }
     }
 

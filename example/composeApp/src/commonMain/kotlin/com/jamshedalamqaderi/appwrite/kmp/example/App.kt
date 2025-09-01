@@ -66,6 +66,15 @@ fun App() {
             }) {
                 Text("Create Session")
             }
+
+            Button(onClick = {
+                scope.launch {
+                    val response = client.ping()
+                    println("Ping response: $response")
+                }
+            }){
+                Text("Ping")
+            }
         }
     }
 }
