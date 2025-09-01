@@ -25,6 +25,7 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -43,13 +44,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
-import kotlin.coroutines.CoroutineContext
 
 @OptIn(FlowPreview::class)
 class Realtime(client: Client) : Service(client), CoroutineScope {
     companion object {
         private const val DEBOUNCE_MILLIS = 1L
-        private const val HEARTBEAT_INTERVAL = 20_000L
+        private const val HEARTBEAT_INTERVAL = 10_000L
     }
 
     private val logger = Logger.withTag(this::class.simpleName.toString())

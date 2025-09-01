@@ -1,11 +1,14 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  * Target
  */
+@OptIn(ExperimentalTime::class)
 @Serializable
 data class Target(
     /**
@@ -17,12 +20,12 @@ data class Target(
      * Target creation time in ISO 8601 format.
      */
     @SerialName("\$createdAt")
-    val createdAt: String,
+    val createdAt: Instant,
     /**
      * Target update date in ISO 8601 format.
      */
     @SerialName("\$updatedAt")
-    val updatedAt: String,
+    val updatedAt: Instant,
     /**
      * Target Name.
      */

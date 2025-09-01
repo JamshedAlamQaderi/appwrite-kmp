@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.jamshedalamqaderi.kmp.appwrite.Client
+import com.jamshedalamqaderi.kmp.appwrite.Query
 import com.jamshedalamqaderi.kmp.appwrite.services.Account
 import com.jamshedalamqaderi.kmp.appwrite.services.Databases
 import com.jamshedalamqaderi.kmp.appwrite.services.Realtime
@@ -69,10 +70,31 @@ fun App() {
 
             Button(onClick = {
                 scope.launch {
+                    runCatching {
+                        val document = database.getDocument(
+                            DB_ID,
+                            "teacher",
+                            "68b099c200294b175ead"
+                        )
+                        println("Document: $document")
+                        val logs = account.listLogs(listOf(
+                            Query.limit(2)
+                        ))
+                        println("Logs: $logs")
+                    }.onFailure {
+                        it.printStackTrace()
+                    }
+                }
+            }) {
+                Text("DB Test")
+            }
+
+            Button(onClick = {
+                scope.launch {
                     val response = client.ping()
                     println("Ping response: $response")
                 }
-            }){
+            }) {
                 Text("Ping")
             }
         }

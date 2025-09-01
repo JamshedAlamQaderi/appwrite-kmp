@@ -3,6 +3,8 @@ package com.jamshedalamqaderi.kmp.appwrite.models
 import com.jamshedalamqaderi.kmp.appwrite.extensions.getString
 import com.jamshedalamqaderi.kmp.appwrite.extensions.getStringList
 import com.jamshedalamqaderi.kmp.appwrite.extensions.jsonCast
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,6 +15,7 @@ import kotlinx.serialization.json.jsonObject
 /**
  * Row
  */
+@OptIn(ExperimentalTime::class)
 @Serializable
 data class Row<T>(
     /**
@@ -39,12 +42,12 @@ data class Row<T>(
      * Row creation date in ISO 8601 format.
      */
     @SerialName("\$createdAt")
-    val createdAt: String,
+    val createdAt: Instant,
     /**
      * Row update date in ISO 8601 format.
      */
     @SerialName("\$updatedAt")
-    val updatedAt: String,
+    val updatedAt: Instant,
     /**
      * Row permissions. [Learn more about permissions](https://appwrite.io/docs/permissions).
      */
@@ -57,6 +60,7 @@ data class Row<T>(
     val data: T,
 )
 
+@OptIn(ExperimentalTime::class)
 internal fun <T> JsonElement.asRow(deserializer: DeserializationStrategy<T>): Row<T> {
     val keys =
         listOf(
@@ -81,8 +85,8 @@ internal fun <T> JsonElement.asRow(deserializer: DeserializationStrategy<T>): Ro
         sequence = getString("\$sequence").toLong(),
         tableId = getString("\$collectionId"),
         databaseId = getString("\$databaseId"),
-        createdAt = getString("\$createdAt"),
-        updatedAt = getString("\$updatedAt"),
+        createdAt = Instant.parse(getString("\$createdAt")),
+        updatedAt = Instant.parse(getString("\$updatedAt")),
         permissions = getStringList("\$permissions"),
         data = dataObject.jsonCast(JsonElement.serializer(), deserializer),
     )

@@ -1,11 +1,14 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  * Session
  */
+@OptIn(ExperimentalTime::class)
 @Serializable
 data class Session(
     /**
@@ -17,12 +20,12 @@ data class Session(
      * Session creation date in ISO 8601 format.
      */
     @SerialName("\$createdAt")
-    val createdAt: String,
+    val createdAt: Instant,
     /**
      * Session update date in ISO 8601 format.
      */
     @SerialName("\$updatedAt")
-    val updatedAt: String,
+    val updatedAt: Instant,
     /**
      * User ID.
      */

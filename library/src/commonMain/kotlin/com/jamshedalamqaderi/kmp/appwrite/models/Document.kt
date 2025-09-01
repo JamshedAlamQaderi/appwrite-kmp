@@ -3,6 +3,8 @@ package com.jamshedalamqaderi.kmp.appwrite.models
 import com.jamshedalamqaderi.kmp.appwrite.extensions.getString
 import com.jamshedalamqaderi.kmp.appwrite.extensions.getStringList
 import com.jamshedalamqaderi.kmp.appwrite.extensions.jsonCast
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,6 +15,7 @@ import kotlinx.serialization.json.jsonObject
 /**
  * Document
  */
+@OptIn(ExperimentalTime::class)
 @Deprecated("Use TableDB instead.", replaceWith = ReplaceWith("Row"))
 @Serializable
 data class Document<T>(
@@ -35,12 +38,12 @@ data class Document<T>(
      * Document creation date in ISO 8601 format.
      */
     @SerialName("\$createdAt")
-    val createdAt: String,
+    val createdAt: Instant,
     /**
      * Document update date in ISO 8601 format.
      */
     @SerialName("\$updatedAt")
-    val updatedAt: String,
+    val updatedAt: Instant,
     /**
      * Document permissions. [Learn more about permissions](https://appwrite.io/docs/permissions).
      */
@@ -53,6 +56,7 @@ data class Document<T>(
     val data: T,
 )
 
+@OptIn(ExperimentalTime::class)
 @Deprecated("Use TableDB instead.", replaceWith = ReplaceWith("asRow"))
 internal fun <T> JsonElement.asDocument(deserializer: DeserializationStrategy<T>): Document<T> {
     val keys =
@@ -76,8 +80,8 @@ internal fun <T> JsonElement.asDocument(deserializer: DeserializationStrategy<T>
         id = getString("\$id"),
         collectionId = getString("\$collectionId"),
         databaseId = getString("\$databaseId"),
-        createdAt = getString("\$createdAt"),
-        updatedAt = getString("\$updatedAt"),
+        createdAt = Instant.parse(getString("\$createdAt")),
+        updatedAt = Instant.parse(getString("\$updatedAt")),
         permissions = getStringList("\$permissions"),
         data = dataObject.jsonCast(JsonElement.serializer(), deserializer),
     )

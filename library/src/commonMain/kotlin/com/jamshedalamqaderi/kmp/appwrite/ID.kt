@@ -1,12 +1,13 @@
 package com.jamshedalamqaderi.kmp.appwrite
 
-import kotlinx.datetime.Clock
 import kotlin.random.Random
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class ID {
     companion object {
-        // Generate an hex ID based on timestamp
-        // Recreated from https://www.php.net/manual/en/function.uniqid.php
+
+        @OptIn(ExperimentalTime::class)
         private fun hexTimestamp(): String {
             val now = Clock.System.now()
             val sec = now.epochSeconds.toString(16).padStart(8, '0')

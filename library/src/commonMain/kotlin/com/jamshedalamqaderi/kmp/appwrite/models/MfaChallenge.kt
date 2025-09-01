@@ -1,11 +1,14 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  * MFA Challenge
  */
+@OptIn(ExperimentalTime::class)
 @Serializable
 data class MfaChallenge(
     /**
@@ -17,7 +20,7 @@ data class MfaChallenge(
      * Token creation date in ISO 8601 format.
      */
     @SerialName("\$createdAt")
-    val createdAt: String,
+    val createdAt: Instant,
     /**
      * User ID.
      */
