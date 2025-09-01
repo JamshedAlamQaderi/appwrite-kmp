@@ -27,7 +27,7 @@ internal fun Any.encodeUnknownValue(): JsonElement {
             is JsonElement -> JsonElement.serializer()
             is KSerializer<*> -> error("You passed a list of KSerializer objects, not data!")
             else -> throw SerializationException(
-                "Don’t know how to serialise elements of type ${this::class.qualifiedName}",
+                "Don’t know how to serialise elements of type ${this::class.simpleName}",
             )
         } as KSerializer<Any?>
     return json.encodeToJsonElement(elementSerializer, this)

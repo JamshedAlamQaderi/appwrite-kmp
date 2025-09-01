@@ -2,7 +2,9 @@ package com.jamshedalamqaderi.kmp.appwrite.enums
 
 import kotlinx.serialization.SerialName
 
-enum class AuthenticationFactor(val value: String) {
+enum class AuthenticationFactor(
+    val value: String,
+) {
     @SerialName("email")
     EMAIL("email"),
 

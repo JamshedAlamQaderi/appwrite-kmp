@@ -2,7 +2,9 @@ package com.jamshedalamqaderi.kmp.appwrite.enums
 
 import kotlinx.serialization.SerialName
 
-enum class OAuthProvider(val value: String) {
+enum class OAuthProvider(
+    val value: String,
+) {
     @SerialName("amazon")
     AMAZON("amazon"),
 

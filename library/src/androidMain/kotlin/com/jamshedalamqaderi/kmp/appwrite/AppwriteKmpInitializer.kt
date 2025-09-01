@@ -15,7 +15,5 @@ class AppwriteKmpInitializer : Initializer<Unit> {
         Companion.context = context
     }
 
-    override fun dependencies(): MutableList<Class<out Initializer<*>>> {
-        return mutableListOf()
-    }
+    override fun dependencies(): MutableList<Class<out Initializer<*>>> = mutableListOf()
 }

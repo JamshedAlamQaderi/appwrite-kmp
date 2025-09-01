@@ -3,14 +3,14 @@ package com.jamshedalamqaderi.kmp.appwrite.models
 import com.jamshedalamqaderi.kmp.appwrite.extensions.getString
 import com.jamshedalamqaderi.kmp.appwrite.extensions.getStringList
 import com.jamshedalamqaderi.kmp.appwrite.extensions.jsonCast
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Row

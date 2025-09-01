@@ -34,7 +34,9 @@ import kotlin.jvm.JvmOverloads
 /**
  * The Account service allows you to authenticate and manage a user account.
  **/
-class Account(client: Client) : Service(client) {
+class Account(
+    client: Client,
+) : Service(client) {
     /**
      * Get account
      *
@@ -331,13 +333,14 @@ class Account(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<User<JsonElement>>() },
-        ).asPreferencesUser(nestedType)
+        return client
+            .call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<User<JsonElement>>() },
+            ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -408,13 +411,14 @@ class Account(client: Client) : Service(client) {
             mapOf(
                 "content-type" to "application/json",
             )
-        return client.call(
-            HttpMethod.Put,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<User<JsonElement>>() },
-        ).asPreferencesUser(nestedType)
+        return client
+            .call(
+                HttpMethod.Put,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<User<JsonElement>>() },
+            ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -652,13 +656,14 @@ class Account(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<User<JsonElement>>() },
-        ).asPreferencesUser(nestedType)
+        return client
+            .call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<User<JsonElement>>() },
+            ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -705,13 +710,14 @@ class Account(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<User<JsonElement>>() },
-        ).asPreferencesUser(nestedType)
+        return client
+            .call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<User<JsonElement>>() },
+            ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -762,13 +768,14 @@ class Account(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<User<JsonElement>>() },
-        ).asPreferencesUser(nestedType)
+        return client
+            .call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<User<JsonElement>>() },
+            ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -806,13 +813,14 @@ class Account(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Get,
-            apiPath,
-            apiHeaders,
-            emptyMap(),
-            converter = { it.body<JsonElement>() },
-        ).asPreferences(nestedType)
+        return client
+            .call(
+                HttpMethod.Get,
+                apiPath,
+                apiHeaders,
+                emptyMap(),
+                converter = { it.body<JsonElement>() },
+            ).asPreferences(nestedType)
     }
 
     /**
@@ -851,13 +859,14 @@ class Account(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<User<JsonElement>>() },
-        ).asPreferencesUser(nestedType)
+        return client
+            .call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<User<JsonElement>>() },
+            ).asPreferencesUser(nestedType)
     }
 
     /**
@@ -1325,13 +1334,14 @@ class Account(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            emptyMap(),
-            converter = { it.body<User<JsonElement>>() },
-        ).asPreferencesUser(nestedType)
+        return client
+            .call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                emptyMap(),
+                converter = { it.body<User<JsonElement>>() },
+            ).asPreferencesUser(nestedType)
     }
 
     /**

@@ -2,7 +2,9 @@ package com.jamshedalamqaderi.kmp.appwrite.enums
 
 import kotlinx.serialization.SerialName
 
-enum class ImageFormat(val value: String) {
+enum class ImageFormat(
+    val value: String,
+) {
     @SerialName("jpg")
     JPG("jpg"),
 

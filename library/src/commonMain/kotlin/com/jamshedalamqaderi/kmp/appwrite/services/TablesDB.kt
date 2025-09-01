@@ -17,7 +17,9 @@ import kotlin.jvm.JvmOverloads
 /**
  *
  **/
-class TablesDB(client: Client) : Service(client) {
+class TablesDB(
+    client: Client,
+) : Service(client) {
     /**
      * Get a list of all the user's rows in a given table. You can use the query params to filter your results.
      *

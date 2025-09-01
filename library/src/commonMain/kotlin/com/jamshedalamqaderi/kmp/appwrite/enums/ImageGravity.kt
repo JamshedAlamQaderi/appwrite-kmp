@@ -2,7 +2,9 @@ package com.jamshedalamqaderi.kmp.appwrite.enums
 
 import kotlinx.serialization.SerialName
 
-enum class ImageGravity(val value: String) {
+enum class ImageGravity(
+    val value: String,
+) {
     @SerialName("center")
     CENTER("center"),
 

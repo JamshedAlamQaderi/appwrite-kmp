@@ -49,7 +49,7 @@ class Client(
     var endpoint: String = "https://cloud.appwrite.io/v1",
     var endpointRealtime: String? = null,
     private var selfSigned: Boolean = false,
-    private val logLevel: LogLevel = LogLevel.INFO
+    private val logLevel: LogLevel = LogLevel.INFO,
 ) : CoroutineScope {
     private val job = Job()
     override val coroutineContext: CoroutineContext
@@ -242,49 +242,50 @@ class Client(
         converter: (suspend (HttpResponse) -> T)? = null,
     ): T {
         createOrGetClient()
-        return http.prepareRequest(path.replaceFirst("/", "")) {
-            if (onUpload != null) {
-                onUpload { sent, total ->
-                    onUpload(Progress(total ?: 0L, sent))
+        return http
+            .prepareRequest(path.replaceFirst("/", "")) {
+                if (onUpload != null) {
+                    onUpload { sent, total ->
+                        onUpload(Progress(total ?: 0L, sent))
+                    }
                 }
-            }
-            if (onDownload != null) {
-                onDownload { received, total ->
-                    onDownload(Progress(total ?: 0, received))
+                if (onDownload != null) {
+                    onDownload { received, total ->
+                        onDownload(Progress(total ?: 0, received))
+                    }
                 }
-            }
-            this.method = method
-            headers.forEach {
-                this.headers.append(it.key, it.value)
-            }
-            when (method) {
-                HttpMethod.Get -> {
-                    prepareGetParams(params)
+                this.method = method
+                headers.forEach {
+                    this.headers.append(it.key, it.value)
                 }
+                when (method) {
+                    HttpMethod.Get -> {
+                        prepareGetParams(params)
+                    }
 
-                else -> {
-                    if (headers["content-type"] == ContentType.MultiPart.FormData.toString()) {
-                        prepareMultiDataFormParams(params)
-                    } else {
-                        preparePostParams(params)
+                    else -> {
+                        if (headers["content-type"] == ContentType.MultiPart.FormData.toString()) {
+                            prepareMultiDataFormParams(params)
+                        } else {
+                            preparePostParams(params)
+                        }
+                    }
+                }
+            }.execute { response ->
+                if (response.status.value in 200..299) {
+                    converter?.invoke(response) ?: throw AppwriteException(message = "Response converter is null")
+                } else {
+                    try {
+                        throw response.body<AppwriteException>()
+                    } catch (_: Exception) {
+                        throw AppwriteException(
+                            message = response.bodyAsText(),
+                            code = response.status.value,
+                            type = response.status.description,
+                        )
                     }
                 }
             }
-        }.execute { response ->
-            if (response.status.value in 200..299) {
-                converter?.invoke(response) ?: throw AppwriteException(message = "Response converter is null")
-            } else {
-                try {
-                    throw response.body<AppwriteException>()
-                } catch (_: Exception) {
-                    throw AppwriteException(
-                        message = response.bodyAsText(),
-                        code = response.status.value,
-                        type = response.status.description,
-                    )
-                }
-            }
-        }
     }
 
     private fun HttpRequestBuilder.prepareGetParams(params: Map<String, Any?>) {
@@ -320,7 +321,8 @@ class Client(
                                 InputProvider(
                                     SystemFileSystem.metadataOrNull(value)?.size,
                                 ) {
-                                    SystemFileSystem.source(value)
+                                    SystemFileSystem
+                                        .source(value)
                                         .buffered()
                                 },
                                 Headers.build {

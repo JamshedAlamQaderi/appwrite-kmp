@@ -1,12 +1,12 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
 import com.jamshedalamqaderi.kmp.appwrite.extensions.jsonCast
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Team
@@ -47,8 +47,8 @@ data class Team<T>(
 )
 
 @OptIn(ExperimentalTime::class)
-internal fun <T> Team<JsonElement>.asTeamPreferences(deserializer: DeserializationStrategy<T>): Team<Preferences<T>> {
-    return Team(
+internal fun <T> Team<JsonElement>.asTeamPreferences(deserializer: DeserializationStrategy<T>): Team<Preferences<T>> =
+    Team(
         id = id,
         createdAt = createdAt,
         updatedAt = updatedAt,
@@ -59,4 +59,3 @@ internal fun <T> Team<JsonElement>.asTeamPreferences(deserializer: Deserializati
                 data = this.prefs.jsonCast(JsonElement.serializer(), deserializer),
             ),
     )
-}

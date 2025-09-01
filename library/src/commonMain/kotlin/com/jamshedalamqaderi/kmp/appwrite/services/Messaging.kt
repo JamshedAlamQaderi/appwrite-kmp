@@ -10,7 +10,9 @@ import kotlinx.serialization.json.JsonElement
 /**
  * The Messaging service allows you to send messages to any provider type (SMTP, push notification, SMS, etc.).
  **/
-class Messaging(client: Client) : Service(client) {
+class Messaging(
+    client: Client,
+) : Service(client) {
     /**
      * Create subscriber
      *

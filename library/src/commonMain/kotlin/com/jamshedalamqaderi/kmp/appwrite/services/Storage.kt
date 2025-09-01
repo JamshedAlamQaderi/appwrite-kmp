@@ -24,7 +24,9 @@ import kotlin.jvm.JvmOverloads
 /**
  * The Storage service allows you to manage your project files.
  **/
-class Storage(client: Client) : Service(client) {
+class Storage(
+    client: Client,
+) : Service(client) {
     /**
      * List files
      *

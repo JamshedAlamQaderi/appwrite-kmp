@@ -31,7 +31,9 @@ data class RealtimeResponseEvent<T>(
     var payload: T,
 )
 
-enum class RealtimeCode(val value: Int) {
+enum class RealtimeCode(
+    val value: Int,
+) {
     POLICY_VIOLATION(1008),
     UNKNOWN_ERROR(-1),
 }

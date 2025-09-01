@@ -25,7 +25,6 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -44,9 +43,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
+import kotlin.coroutines.CoroutineContext
 
 @OptIn(FlowPreview::class)
-class Realtime(client: Client) : Service(client), CoroutineScope {
+class Realtime(
+    client: Client,
+) : Service(client),
+    CoroutineScope {
     companion object {
         private const val DEBOUNCE_MILLIS = 1L
         private const val HEARTBEAT_INTERVAL = 10_000L
@@ -149,27 +152,28 @@ class Realtime(client: Client) : Service(client), CoroutineScope {
         heartbeatJob = null
     }
 
-    private fun getTimeout(): Long {
-        return when {
+    private fun getTimeout(): Long =
+        when {
             reconnectAttempts < 5 -> 1000L
             reconnectAttempts < 15 -> 5000L
             reconnectAttempts < 100 -> 10000L
             else -> 60000L
         }
-    }
 
     private suspend fun DefaultClientWebSocketSession.socketSessionLoop(activeChannels: List<String>) {
-        incoming.consumeAsFlow()
+        incoming
+            .consumeAsFlow()
             .mapNotNull { it as? Frame.Text }
             .map { it.readText() }
             .map { it.fromJson<RealtimeResponse<JsonElement>>() }
             .onEach { response ->
                 when (response.type) {
                     "error" -> {
-                        response.data?.jsonCast(
-                            JsonElement.serializer(),
-                            AppwriteException.serializer(),
-                        )?.let { throw it }
+                        response.data
+                            ?.jsonCast(
+                                JsonElement.serializer(),
+                                AppwriteException.serializer(),
+                            )?.let { throw it }
                     }
 
                     "event" -> {
@@ -191,11 +195,9 @@ class Realtime(client: Client) : Service(client), CoroutineScope {
 
                     else -> {}
                 }
-            }
-            .catch {
+            }.catch {
                 logger.e(it) { "Error while parsing event response" }
-            }
-            .onCompletion { cause ->
+            }.onCompletion { cause ->
                 stopHeartbeat()
                 if (!reconnect) {
                     reconnect = true
@@ -206,7 +208,6 @@ class Realtime(client: Client) : Service(client), CoroutineScope {
                 delay(timeout)
                 reconnectAttempts++
                 subscriptionRequests.tryEmit(Unit)
-            }
-            .collect()
+            }.collect()
     }
 }

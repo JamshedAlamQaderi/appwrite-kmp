@@ -15,7 +15,9 @@ import io.ktor.http.HttpMethod
 /**
  * The Locale service allows you to customize your app based on your users&#039; location.
  **/
-class Locales(client: Client) : Service(client) {
+class Locales(
+    client: Client,
+) : Service(client) {
     /**
      * Get user locale
      *

@@ -18,7 +18,9 @@ import kotlin.jvm.JvmOverloads
  * The Databases service allows you to create structured collections of documents, query and filter lists of documents
  **/
 @Deprecated("Databases service is deprecated. Use the TableDB API instead.", replaceWith = ReplaceWith("TablesDB"))
-class Databases(client: Client) : Service(client) {
+class Databases(
+    client: Client,
+) : Service(client) {
     /**
      * List documents
      *
@@ -390,13 +392,14 @@ class Databases(client: Client) : Service(client) {
             mutableMapOf(
                 "content-type" to "application/json",
             )
-        return client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() },
-        ).asDocument(nestedType)
+        return client
+            .call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            ).asDocument(nestedType)
     }
 
     /**
@@ -474,13 +477,14 @@ class Databases(client: Client) : Service(client) {
             mapOf(
                 "content-type" to "application/json",
             )
-        return client.call(
-            HttpMethod.Patch,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() },
-        ).asDocument(nestedType)
+        return client
+            .call(
+                HttpMethod.Patch,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            ).asDocument(nestedType)
     }
 
     /**

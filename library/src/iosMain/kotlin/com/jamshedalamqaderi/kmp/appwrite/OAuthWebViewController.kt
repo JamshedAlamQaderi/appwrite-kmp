@@ -19,7 +19,8 @@ class OAuthWebViewController(
     private val authUrl: String,
     private val callbackScheme: String,
     private val onResult: (String?, String?) -> Unit,
-) : UIViewController(nibName = null, bundle = null), WKNavigationDelegateProtocol {
+) : UIViewController(nibName = null, bundle = null),
+    WKNavigationDelegateProtocol {
     private lateinit var webView: WKWebView
 
     @OptIn(ExperimentalForeignApi::class)
@@ -50,7 +51,9 @@ class OAuthWebViewController(
         val systemName = UIDevice.currentDevice.systemName
         val systemVersion = UIDevice.currentDevice.systemVersion.replace(".", "_")
         val model = UIDevice.currentDevice.model
-        return "Mozilla/5.0 ($model; CPU $systemName $systemVersion like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/605.1.15"
+        return "Mozilla/5.0 ($model; CPU $systemName $systemVersion like Mac OS X) " +
+            "AppleWebKit/605.1.15 (KHTML, like Gecko) " +
+            "Version/14.0 Mobile/15E148 Safari/605.1.15"
     }
 
     @OptIn(ExperimentalForeignApi::class)

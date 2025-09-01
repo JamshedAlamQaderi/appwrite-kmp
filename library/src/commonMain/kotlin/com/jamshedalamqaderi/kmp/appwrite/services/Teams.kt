@@ -20,7 +20,9 @@ import kotlin.jvm.JvmOverloads
 /**
  * The Teams service allows you to group users of your project and to enable them to share read and write access to your project resources
  **/
-class Teams(client: Client) : Service(client) {
+class Teams(
+    client: Client,
+) : Service(client) {
     /**
      * List teams
      *
@@ -113,13 +115,14 @@ class Teams(client: Client) : Service(client) {
                 put("name", name)
                 put("roles", roles ?: emptyList<String>())
             }
-        return client.call(
-            HttpMethod.Post,
-            apiPath,
-            apiHeaders,
-            params,
-            converter = { it.body<Team<JsonElement>>() },
-        ).asTeamPreferences(nestedType)
+        return client
+            .call(
+                HttpMethod.Post,
+                apiPath,
+                apiHeaders,
+                params,
+                converter = { it.body<Team<JsonElement>>() },
+            ).asTeamPreferences(nestedType)
     }
 
     /**
@@ -167,13 +170,14 @@ class Teams(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Get,
-            apiPath,
-            apiHeaders,
-            emptyMap(),
-            converter = { it.body<Team<JsonElement>>() },
-        ).asTeamPreferences(nestedType)
+        return client
+            .call(
+                HttpMethod.Get,
+                apiPath,
+                apiHeaders,
+                emptyMap(),
+                converter = { it.body<Team<JsonElement>>() },
+            ).asTeamPreferences(nestedType)
     }
 
     /**
@@ -217,13 +221,14 @@ class Teams(client: Client) : Service(client) {
             mapOf(
                 "name" to name,
             )
-        return client.call(
-            HttpMethod.Put,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<Team<JsonElement>>() },
-        ).asTeamPreferences(nestedType)
+        return client
+            .call(
+                HttpMethod.Put,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<Team<JsonElement>>() },
+            ).asTeamPreferences(nestedType)
     }
 
     /**
@@ -525,13 +530,14 @@ class Teams(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Get,
-            apiPath,
-            apiHeaders,
-            emptyMap(),
-            converter = { it.body<JsonElement>() },
-        ).asPreferences(nestedType)
+        return client
+            .call(
+                HttpMethod.Get,
+                apiPath,
+                apiHeaders,
+                emptyMap(),
+                converter = { it.body<JsonElement>() },
+            ).asPreferences(nestedType)
     }
 
     /**
@@ -576,13 +582,14 @@ class Teams(client: Client) : Service(client) {
                 "content-type" to "application/json",
             )
 
-        return client.call(
-            HttpMethod.Put,
-            apiPath,
-            apiHeaders,
-            apiParams,
-            converter = { it.body<JsonElement>() },
-        ).asPreferences(nestedType)
+        return client
+            .call(
+                HttpMethod.Put,
+                apiPath,
+                apiHeaders,
+                apiParams,
+                converter = { it.body<JsonElement>() },
+            ).asPreferences(nestedType)
     }
 
     /**

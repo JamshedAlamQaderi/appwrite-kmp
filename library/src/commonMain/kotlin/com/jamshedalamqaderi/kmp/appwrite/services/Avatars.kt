@@ -12,7 +12,9 @@ import kotlin.jvm.JvmOverloads
 /**
  * The Avatars service aims to help you complete everyday tasks related to your app image, icons, and avatars.
  **/
-class Avatars(client: Client) : Service(client) {
+class Avatars(
+    client: Client,
+) : Service(client) {
     /**
      * Get browser icon
      *

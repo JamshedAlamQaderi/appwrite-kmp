@@ -1,9 +1,9 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Membership

@@ -6,7 +6,6 @@ import kotlin.time.ExperimentalTime
 
 class ID {
     companion object {
-
         @OptIn(ExperimentalTime::class)
         private fun hexTimestamp(): String {
             val now = Clock.System.now()

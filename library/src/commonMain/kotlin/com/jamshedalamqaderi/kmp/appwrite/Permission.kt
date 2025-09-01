@@ -17,28 +17,18 @@ package com.jamshedalamqaderi.kmp.appwrite
 class Permission {
     companion object {
         /** Returns a read permission for the given [role]. */
-        fun read(role: String): String {
-            return "read(\"${role}\")"
-        }
+        fun read(role: String): String = "read(\"${role}\")"
 
         /** Returns a write permission for the given [role]. */
-        fun write(role: String): String {
-            return "write(\"${role}\")"
-        }
+        fun write(role: String): String = "write(\"${role}\")"
 
         /** Returns a creation permission for the given [role]. */
-        fun create(role: String): String {
-            return "create(\"${role}\")"
-        }
+        fun create(role: String): String = "create(\"${role}\")"
 
         /** Returns an update permission for the given [role]. */
-        fun update(role: String): String {
-            return "update(\"${role}\")"
-        }
+        fun update(role: String): String = "update(\"${role}\")"
 
         /** Returns a delete permission for the given [role]. */
-        fun delete(role: String): String {
-            return "delete(\"${role}\")"
-        }
+        fun delete(role: String): String = "delete(\"${role}\")"
     }
 }

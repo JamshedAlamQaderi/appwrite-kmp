@@ -14,7 +14,8 @@ import javax.net.ssl.X509TrustManager
 internal actual fun httpEngine(selfSigned: Boolean): HttpClientEngine =
     OkHttp.create {
         preconfigured =
-            OkHttpClient.Builder()
+            OkHttpClient
+                .Builder()
                 .pingInterval(0, TimeUnit.MILLISECONDS)
                 .build()
         if (selfSigned) {
@@ -47,15 +48,14 @@ internal actual fun httpEngine(selfSigned: Boolean): HttpClientEngine =
         }
     }
 
-private fun appVersion(context: Context): String? {
-    return try {
+private fun appVersion(context: Context): String? =
+    try {
         val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
         pInfo.versionName
     } catch (e: PackageManager.NameNotFoundException) {
         e.printStackTrace()
         ""
     }
-}
 
 internal actual fun defaultHeaders(): MutableMap<String, String> {
     val context = AppwriteKmpInitializer.context

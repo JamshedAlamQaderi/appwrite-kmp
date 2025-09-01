@@ -1,11 +1,11 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * User
@@ -111,8 +111,8 @@ data class User<T>(
 )
 
 @OptIn(ExperimentalTime::class)
-internal fun <T> User<JsonElement>.asPreferencesUser(deserializer: DeserializationStrategy<T>): User<Preferences<T>> {
-    return User(
+internal fun <T> User<JsonElement>.asPreferencesUser(deserializer: DeserializationStrategy<T>): User<Preferences<T>> =
+    User(
         id = id,
         createdAt = createdAt,
         updatedAt = updatedAt,
@@ -133,4 +133,3 @@ internal fun <T> User<JsonElement>.asPreferencesUser(deserializer: Deserializati
         targets = targets,
         accessedAt = accessedAt,
     )
-}

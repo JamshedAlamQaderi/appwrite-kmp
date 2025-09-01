@@ -2,7 +2,9 @@ package com.jamshedalamqaderi.kmp.appwrite.enums
 
 import kotlinx.serialization.SerialName
 
-enum class Browser(val value: String) {
+enum class Browser(
+    val value: String,
+) {
     @SerialName("aa")
     AVANT_BROWSER("aa"),
 

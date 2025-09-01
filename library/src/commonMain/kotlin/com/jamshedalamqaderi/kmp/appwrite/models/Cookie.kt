@@ -19,8 +19,8 @@ data class Cookie(
     val httpOnly: Boolean = false,
     val extensions: Map<String, String?> = emptyMap(),
 ) {
-    fun toHttpCookie(): io.ktor.http.Cookie {
-        return io.ktor.http.Cookie(
+    fun toHttpCookie(): io.ktor.http.Cookie =
+        io.ktor.http.Cookie(
             name,
             value,
             encoding,
@@ -32,11 +32,10 @@ data class Cookie(
             httpOnly,
             extensions,
         )
-    }
 
     companion object {
-        fun from(cookie: io.ktor.http.Cookie): Cookie {
-            return Cookie(
+        fun from(cookie: io.ktor.http.Cookie): Cookie =
+            Cookie(
                 cookie.name,
                 cookie.value,
                 cookie.encoding,
@@ -48,6 +47,5 @@ data class Cookie(
                 cookie.httpOnly,
                 cookie.extensions,
             )
-        }
     }
 }

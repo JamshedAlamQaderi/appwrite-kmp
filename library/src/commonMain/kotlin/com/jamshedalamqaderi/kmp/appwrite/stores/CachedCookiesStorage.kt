@@ -10,11 +10,11 @@ import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.http.Cookie
 import io.ktor.http.Url
 import io.ktor.util.date.getTimeMillis
-import kotlin.math.min
 import kotlinx.atomicfu.AtomicLong
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.math.min
 
 private val settings = Settings()
 
@@ -39,7 +39,7 @@ internal class CachedCookiesStorage : CookiesStorage {
             val container = readAllCookies().toMutableList()
             container.removeAll { (existingCookie, _) ->
                 existingCookie.name == cookie.name &&
-                        existingCookie.toHttpCookie().matches(requestUrl)
+                    existingCookie.toHttpCookie().matches(requestUrl)
             }
             val createdAt = getTimeMillis()
             container.add(
@@ -74,11 +74,11 @@ internal class CachedCookiesStorage : CookiesStorage {
             return@withLock cookies
         }
 
-    private fun readAllCookies(): List<CookieCache> {
-        return settings.getStringOrNull("cookies")
+    private fun readAllCookies(): List<CookieCache> =
+        settings
+            .getStringOrNull("cookies")
             ?.fromJson<List<CookieCache>>()
             ?: emptyList()
-    }
 
     private fun writeAllCookies(cookies: List<CookieCache>) {
         settings.putString("cookies", cookies.toJson())
