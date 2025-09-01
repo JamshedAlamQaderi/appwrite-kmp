@@ -1,11 +1,14 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  * Log
  */
+@OptIn(ExperimentalTime::class)
 @Serializable
 data class Log(
     /**
@@ -42,7 +45,7 @@ data class Log(
      * Log creation date in ISO 8601 format.
      */
     @SerialName("time")
-    val time: String,
+    val time: Instant,
     /**
      * Operating system code name. View list of [available options](https://github.com/appwrite/appwrite/blob/master/docs/lists/os.json).
      */

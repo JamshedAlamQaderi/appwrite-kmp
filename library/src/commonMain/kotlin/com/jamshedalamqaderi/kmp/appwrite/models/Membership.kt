@@ -1,11 +1,14 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  * Membership
  */
+@OptIn(ExperimentalTime::class)
 @Serializable
 data class Membership(
     /**
@@ -17,12 +20,12 @@ data class Membership(
      * Membership creation date in ISO 8601 format.
      */
     @SerialName("\$createdAt")
-    val createdAt: String,
+    val createdAt: Instant,
     /**
      * Membership update date in ISO 8601 format.
      */
     @SerialName("\$updatedAt")
-    val updatedAt: String,
+    val updatedAt: Instant,
     /**
      * User ID.
      */
@@ -57,7 +60,7 @@ data class Membership(
      * Date, the user has accepted the invitation to join the team in ISO 8601 format.
      */
     @SerialName("joined")
-    val joined: String,
+    val joined: Instant,
     /**
      * User confirmation status, true if the user has joined the team or false otherwise.
      */

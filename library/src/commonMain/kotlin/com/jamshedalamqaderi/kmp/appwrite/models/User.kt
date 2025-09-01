@@ -1,5 +1,7 @@
 package com.jamshedalamqaderi.kmp.appwrite.models
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -8,6 +10,7 @@ import kotlinx.serialization.json.JsonElement
 /**
  * User
  */
+@OptIn(ExperimentalTime::class)
 @Serializable
 data class User<T>(
     /**
@@ -19,12 +22,12 @@ data class User<T>(
      * User creation date in ISO 8601 format.
      */
     @SerialName("\$createdAt")
-    val createdAt: String,
+    val createdAt: Instant,
     /**
      * User update date in ISO 8601 format.
      */
     @SerialName("\$updatedAt")
-    val updatedAt: String,
+    val updatedAt: Instant,
     /**
      * User name.
      */
@@ -107,6 +110,7 @@ data class User<T>(
     val accessedAt: String,
 )
 
+@OptIn(ExperimentalTime::class)
 internal fun <T> User<JsonElement>.asPreferencesUser(deserializer: DeserializationStrategy<T>): User<Preferences<T>> {
     return User(
         id = id,

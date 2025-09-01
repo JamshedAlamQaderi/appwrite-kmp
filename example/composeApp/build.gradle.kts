@@ -33,7 +33,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "composeApp"
+        outputModuleName = "composeApp"
         browser {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
@@ -43,7 +43,6 @@ kotlin {
                     (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                         static =
                             (static ?: mutableListOf()).apply {
-                                // Serve sources to debug inside browser
                                 add(rootDirPath)
                                 add(projectDirPath)
                             }
