@@ -49,6 +49,7 @@ class Client(
     var endpoint: String = "https://cloud.appwrite.io/v1",
     var endpointRealtime: String? = null,
     private var selfSigned: Boolean = false,
+    private val logLevel: LogLevel = LogLevel.INFO
 ) : CoroutineScope {
     private val job = Job()
     override val coroutineContext: CoroutineContext
@@ -384,7 +385,7 @@ class Client(
                     storage = CachedCookiesStorage()
                 }
                 install(Logging) {
-                    level = LogLevel.INFO
+                    level = logLevel
                 }
                 install(DefaultRequest) {
                     if (endpoint.endsWith("/")) {

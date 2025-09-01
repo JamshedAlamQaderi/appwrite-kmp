@@ -294,12 +294,11 @@ class Databases(client: Client) : Service(client) {
      * @param databaseId Database ID.
      * @param collectionId Collection ID.
      * @param documentId Document ID.
-     * @param data Document data as JSON object. Include only attribute and value pairs to be updated.
+     * @param data Document data as a JSON object. Include only attribute and value pairs to be updated.
      * @param permissions An array of permissions strings. By default, the current permissions are inherited. [Learn more about permissions](https://appwrite.io/docs/permissions).
      * @return [io.appwrite.models.Document<T>]
      */
     @JvmOverloads
-    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun updateDocument(
         databaseId: String,
         collectionId: String,
@@ -416,7 +415,6 @@ class Databases(client: Client) : Service(client) {
         replaceWith = ReplaceWith("io.appwrite.services.TablesDB.decrementRowColumn"),
     )
     @JvmOverloads
-    @Throws(AppwriteException::class)
     suspend fun decrementDocumentAttribute(
         databaseId: String,
         collectionId: String,
@@ -501,7 +499,7 @@ class Databases(client: Client) : Service(client) {
         replaceWith = ReplaceWith("io.appwrite.services.TablesDB.incrementRowColumn"),
     )
     @JvmOverloads
-    @Throws(AppwriteException::class)
+    @Throws(AppwriteException::class, CancellationException::class)
     suspend fun incrementDocumentAttribute(
         databaseId: String,
         collectionId: String,
