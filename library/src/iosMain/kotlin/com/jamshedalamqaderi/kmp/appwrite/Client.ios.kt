@@ -16,26 +16,23 @@ import platform.Foundation.NSURLSessionTask
 import platform.Foundation.create
 import platform.Foundation.serverTrust
 import platform.UIKit.UIDevice
-import platform.darwin.NSUInteger
 
 @OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
 @Suppress("MISSING_DEPENDENCY_CLASS_IN_EXPRESSION_TYPE")
 internal actual fun httpEngine(selfSigned: Boolean): HttpClientEngine = Darwin.create {
     if (selfSigned) {
-        val useCredential = NSURLSessionAuthChallengeUseCredential
-        val performDefault = NSURLSessionAuthChallengePerformDefaultHandling
         handleChallenge { _: NSURLSession, _: NSURLSessionTask?, challenge: NSURLAuthenticationChallenge, completionHandler ->
             val method = challenge.protectionSpace.authenticationMethod
             if (method == NSURLAuthenticationMethodServerTrust) {
                 val trust = challenge.protectionSpace.serverTrust
                 if (trust != null) {
                     val credential = NSURLCredential.create(trust)
-                    completionHandler(useCredential, credential)
+                    completionHandler(NSURLSessionAuthChallengeUseCredential, credential)
                 } else {
-                    completionHandler(performDefault, null)
+                    completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, null)
                 }
             } else {
-                completionHandler(performDefault, null)
+                completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, null)
             }
         }
     } else {
