@@ -58,6 +58,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activitycompose)
+            implementation("io.appwrite:sdk-for-android:10.0.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

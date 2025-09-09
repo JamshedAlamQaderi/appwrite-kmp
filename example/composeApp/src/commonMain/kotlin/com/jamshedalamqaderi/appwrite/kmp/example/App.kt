@@ -17,6 +17,7 @@ import com.jamshedalamqaderi.kmp.appwrite.Query
 import com.jamshedalamqaderi.kmp.appwrite.services.Account
 import com.jamshedalamqaderi.kmp.appwrite.services.Databases
 import com.jamshedalamqaderi.kmp.appwrite.services.Realtime
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -26,12 +27,11 @@ const val STUDENT_COLLECTION = "68a459c20031a865d804"
 @Composable
 @Preview
 fun App() {
-    val client: Client =
-        remember {
-            Client()
-                .setEndpoint("https://cloud.appwrite.io/v1")
-                .setProject("68a1e08c00254a7e9714")
-        }
+    val client: Client = remember {
+        Client()
+            .setEndpoint("https://fra.cloud.appwrite.io/v1")
+            .setProject("68a1e08c00254a7e9714")
+    }
     val account = remember(client) { Account(client) }
     val database = remember(client) { Databases(client) }
     val realtime = remember(client) { Realtime(client) }
@@ -57,7 +57,7 @@ fun App() {
             verticalArrangement = Arrangement.Center,
         ) {
             Button(onClick = {
-                scope.launch {
+                scope.launch(Dispatchers.Default) {
                     runCatching {
                         println("Session: ${account.createEmailPasswordSession("example@gmail.com", "abcd13579")}")
                     }.onFailure {
@@ -77,9 +77,11 @@ fun App() {
                             "68b099c200294b175ead"
                         )
                         println("Document: $document")
-                        val logs = account.listLogs(listOf(
-                            Query.limit(2)
-                        ))
+                        val logs = account.listLogs(
+                            listOf(
+                                Query.limit(2)
+                            )
+                        )
                         println("Logs: $logs")
                     }.onFailure {
                         it.printStackTrace()
