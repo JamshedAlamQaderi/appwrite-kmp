@@ -7,6 +7,7 @@ import com.jamshedalamqaderi.kmp.appwrite.WebAuthComponent
 import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
 import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.launch
 
 actual suspend fun launchOAuth2Url(
     authUrl: String,

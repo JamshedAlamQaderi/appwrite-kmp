@@ -49,14 +49,12 @@ kotlin {
 
                 // ktor
                 implementation(libs.ktor.client.core)
-                implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.client.serialization)
                 implementation(libs.ktor.client.contentNegotiation)
                 implementation(libs.ktor.client.serialization)
 
                 // util
                 implementation(libs.multiplatform.settings)
-
                 implementation(libs.logging.kermit)
                 implementation(libs.kotlinx.coroutines.core)
             }
@@ -68,11 +66,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime)
             implementation(libs.androidx.lifecycle.common)
             implementation(libs.androidx.startup)
-            implementation(libs.logging.android)
         }
         jvmMain.dependencies {
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.logging.logback)
         }
         jsMain.dependencies {
             implementation(libs.ktor.client.js)

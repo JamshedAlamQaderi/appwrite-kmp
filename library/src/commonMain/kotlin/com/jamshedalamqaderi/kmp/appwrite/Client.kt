@@ -1,17 +1,16 @@
 package com.jamshedalamqaderi.kmp.appwrite
 
+import co.touchlab.kermit.Logger
 import com.jamshedalamqaderi.kmp.appwrite.exceptions.AppwriteException
 import com.jamshedalamqaderi.kmp.appwrite.extensions.encodeUnknownValue
+import com.jamshedalamqaderi.kmp.appwrite.extensions.tryFromJson
 import com.jamshedalamqaderi.kmp.appwrite.models.Progress
 import com.jamshedalamqaderi.kmp.appwrite.stores.CachedCookiesStorage
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.cookies.HttpCookies
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.plugins.websocket.WebSockets
@@ -30,6 +29,9 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -41,15 +43,11 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Duration.Companion.seconds
 
 class Client(
     var endpoint: String = "https://cloud.appwrite.io/v1",
     var endpointRealtime: String? = null,
     private var selfSigned: Boolean = false,
-    private val logLevel: LogLevel = LogLevel.INFO,
 ) : CoroutineScope {
     private val job = Job()
     override val coroutineContext: CoroutineContext
@@ -139,6 +137,21 @@ class Client(
     fun setSession(value: String): Client {
         config["session"] = value
         addHeader("x-appwrite-session", value)
+        return this
+    }
+
+    /**
+     * Set DevKey
+     *
+     * Your secret dev API key
+     *
+     * @param {string} devkey
+     *
+     * @return this
+     */
+    fun setDevKey(value: String): Client {
+        config["devKey"] = value
+        addHeader("x-appwrite-dev-key", value)
         return this
     }
 
@@ -275,15 +288,16 @@ class Client(
                 if (response.status.value in 200..299) {
                     converter?.invoke(response) ?: throw AppwriteException(message = "Response converter is null")
                 } else {
-                    try {
-                        throw response.body<AppwriteException>()
-                    } catch (_: Exception) {
-                        throw AppwriteException(
-                            message = response.bodyAsText(),
+                    val responseBody = response.bodyAsText()
+                    val exception = responseBody
+                        .tryFromJson(AppwriteException.serializer())
+                        ?: AppwriteException(
+                            message = responseBody,
                             code = response.status.value,
                             type = response.status.description,
                         )
-                    }
+                    Logger.e { "Appwrite Exception: $exception" }
+                    throw exception
                 }
             }
     }
@@ -291,6 +305,7 @@ class Client(
     private fun HttpRequestBuilder.prepareGetParams(params: Map<String, Any?>) {
         for ((key, value) in params) {
             when (value) {
+                null -> continue
                 is List<*> -> {
                     for (item in value) {
                         parameter("$key[]", item.toString())
@@ -384,10 +399,7 @@ class Client(
                     json(Json { ignoreUnknownKeys = true })
                 }
                 install(HttpCookies) {
-                    storage = CachedCookiesStorage()
-                }
-                install(Logging) {
-                    level = logLevel
+                    storage = CachedCookiesStorage
                 }
                 install(DefaultRequest) {
                     if (endpoint.endsWith("/")) {

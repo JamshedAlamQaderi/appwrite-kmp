@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.jamshedalamqaderi.kmp.appwrite.services
 
 import com.jamshedalamqaderi.kmp.appwrite.Client
@@ -22,14 +24,18 @@ import com.jamshedalamqaderi.kmp.appwrite.models.Token
 import com.jamshedalamqaderi.kmp.appwrite.models.User
 import com.jamshedalamqaderi.kmp.appwrite.models.asPreferences
 import com.jamshedalamqaderi.kmp.appwrite.models.asPreferencesUser
+import com.jamshedalamqaderi.kmp.appwrite.stores.CachedCookiesStorage
 import io.ktor.client.call.body
+import io.ktor.http.Cookie
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
+import io.ktor.http.isSecure
 import io.ktor.util.PlatformUtils
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.JsonElement
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmOverloads
+import kotlin.time.ExperimentalTime
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.JsonElement
 
 /**
  * The Account service allows you to authenticate and manage a user account.
@@ -1125,7 +1131,9 @@ class Account(
         apiParams.forEach {
             when (it.value) {
                 is List<*> -> {
-                    apiQuery.add("${it.key}[]=${it.value}")
+                    (it.value as List<*>).forEach { value ->
+                        apiQuery.add("${it.key}[]=${value.toString()}")
+                    }
                 }
 
                 else -> {
@@ -1142,32 +1150,20 @@ class Account(
         val secret =
             url.parameters["secret"]
                 ?: throw AppwriteException("OAuth2 response missing 'secret' parameter.")
-        val userId =
-            url.parameters["userId"]
-                ?: throw AppwriteException("OAuth2 response missing 'userId' parameter.")
-
-        createSession(userId, secret)
-    }
-
-    /**
-     * Create OAuth2 session
-     *
-     * Allow the user to login to their account using the OAuth2 provider of their choice. Each OAuth2 provider should be enabled from the Appwrite console first. Use the success and failure arguments to provide a redirect URL&#039;s back to your app when login is completed.If there is already an active session, the new session will be attached to the logged-in account. If there are no active sessions, the server will attempt to look for a user with the same email address as the email received from the OAuth2 provider and attach the new session to the existing user. If no matching user is found - the server will create a new user.A user is limited to 10 active sessions at a time by default. [Learn more about session limits](https://appwrite.io/docs/authentication-security#limits).
-     *
-     * @param provider OAuth2 Provider. Currently, supported providers are: amazon, apple, auth0, authentik, autodesk, bitbucket, bitly, box, dailymotion, discord, disqus, dropbox, etsy, facebook, github, gitlab, google, linkedin, microsoft, notion, oidc, okta, paypal, paypalSandbox, podio, salesforce, slack, spotify, stripe, tradeshift, tradeshiftBox, twitch, wordpress, yahoo, yammer, yandex, zoho, zoom.
-     * @param scopes A list of custom OAuth2 scopes. Check each provider internal docs for a list of supported scopes. Maximum of 100 scopes are allowed, each 4096 characters long.
-     */
-    @JvmOverloads
-    suspend fun createOAuth2Session(
-        provider: OAuthProvider,
-        scopes: List<String>? = null,
-    ) {
-        val url = Url(client.endpoint)
-        return createOAuth2Session(
-            provider = provider,
-            success = "appwrite-callback-${client.config["project"]}://${url.host}/auth/oauth2/success",
-            failure = "appwrite-callback-${client.config["project"]}://${url.host}/auth/oauth2/failure",
-            scopes = scopes,
+        val sessionId =
+            url.parameters["key"]
+                ?: throw AppwriteException("OAuth2 response missing 'key' parameter.")
+        val requestUrl = Url(client.endpoint)
+        CachedCookiesStorage.addCookie(
+            requestUrl,
+            Cookie(
+                name = sessionId,
+                value = secret,
+                domain = requestUrl.host,
+                path = "/",
+                httpOnly = true,
+                secure = requestUrl.protocol.isSecure(),
+            )
         )
     }
 
@@ -1229,7 +1225,6 @@ class Account(
             mapOf(
                 "content-type" to "application/json",
             )
-
         return client.call(
             HttpMethod.Post,
             apiPath,
